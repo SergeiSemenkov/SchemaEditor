@@ -9,7 +9,12 @@
     >
       <v-toolbar-title>eMondrian schema editor</v-toolbar-title>
       <v-spacer />
-      <v-btn @click="downloadSchema">Download schema file</v-btn>
+      <v-btn
+        v-if="xmlDoc"
+        @click="downloadSchema"
+      >
+        Download schema file
+      </v-btn>
     </v-app-bar>
     <v-navigation-drawer
       app
