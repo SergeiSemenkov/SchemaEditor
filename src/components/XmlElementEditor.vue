@@ -11,11 +11,11 @@
       <v-row class="flex-wrap ma-4">
         <v-col cols=12>
           <v-row>
-            <v-col cols=8>
-              <h2>Element Type: {{ elementType }}</h2>
+            <v-col cols=6>
+              <h2>Edit element</h2>
             </v-col>
             <v-spacer />
-            <v-col>
+            <v-col cols=3>
               <v-btn
                 v-if="!elementRequired"
                 block
@@ -25,13 +25,28 @@
                 Delete
               </v-btn>
             </v-col>
-            <v-col>
+            <v-col cols=3>
               <v-btn
                 block
                 :disabled="!hasChanges"
                 @click="saveChanges"
               >
                 Save
+              </v-btn>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols=6>
+              <h2>Type: {{ elementType }}</h2>
+            </v-col>
+            <v-spacer />
+            <v-col cols=6>
+              <v-btn
+                v-if="possibleElements"
+                block
+                @click="openChangeTypeModal"
+              >
+                Change type
               </v-btn>
             </v-col>
           </v-row>
@@ -55,6 +70,7 @@
                     v-model="configuredElement[attribute.name]"
                     :label="attribute.name"
                     :items="attribute.values"
+                    :rules="rules.required"
                     dense
                   ></component>
                   <p class="mt-n2 text-caption" v-html="attribute.doc"></p>
@@ -133,6 +149,40 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog
+      v-model="changeTypeDialog"
+      width="500"
+    >
+      <v-card>
+        <v-card-title class="text-h5 grey lighten-2">
+          Change element type
+        </v-card-title>
+         <v-card-text class="pa-4">
+           <v-select
+            v-model="newElementType"
+            :items="possibleElements"
+            label="Select element type"
+          ></v-select>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="primary"
+            text
+            @click="changeTypeDialog = false"
+          >
+            Cancel
+          </v-btn>
+          <v-btn
+            color="success"
+            text
+            @click="changeType"
+          >
+            Change
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-row>
 </template>
 
@@ -154,6 +204,10 @@ export default {
     elementRequired: {
       type: Boolean,
       default: false
+    },
+    parentDesctiption: {
+      type: Object,
+      default: () => {}
     }
   },
   data() {
@@ -170,8 +224,18 @@ export default {
     initialValue = Object.assign({}, configuredElement);
     return {
       elementDesc: desc,
+      elementInEditor: this.element.cloneNode(),
       configuredElement,
-      confirmationDialog: false
+      confirmationDialog: false,
+      changeTypeDialog: false,
+      possibleElements: this.parentDesctiption ? this.getElementsOfType(this.parentDesctiption.type) : null,
+      newElementType: this.element.tagName,
+      rules: {
+        required: [
+          value => !!value || 'Required.',
+          // value => (value && value.length >= 3) || 'Min 3 characters',
+        ],
+      },
     }
   },
   computed: {
@@ -193,21 +257,58 @@ export default {
       return !_.isEqual(initialValue, this.configuredElement);
     },
     elementType() {
-      return this.element.tagName
+      return this.elementInEditor.tagName
     }
   },
   methods: {
+    openChangeTypeModal() {
+      this.changeTypeDialog = true
+    },
+    changeType() {
+      const newItem = document.createElementNS(null, this.newElementType)
+      const desc = this.getDescriptionForElement(this.newElementType)
+
+      for(var i = 0; i < this.element.attributes.length; i++){
+        var nodeName  = this.element.attributes.item(i).nodeName;
+        var nodeValue = this.element.attributes.item(i).nodeValue;
+        if (desc.attributes.find(e => e.name === nodeName)) {
+          newItem.setAttribute(nodeName, nodeValue);
+        }
+      }
+
+      // Persist contents
+      newItem.innerHTML = this.element.innerHTML;
+
+      const configuredElement = {}
+      desc.attributes.forEach((e) => {
+        configuredElement[e.name] = newItem.getAttribute(e.name)
+      });
+      if (desc.hasValue) {
+        configuredElement._value = newItem.innerHTML
+      }
+
+      this.configuredElement = configuredElement
+      this.elementDesc = desc
+      this.elementInEditor = newItem
+
+      this.changeTypeDialog = false;
+    },
     saveChanges() {
       for (const confAttrs in this.configuredElement) {
         if (confAttrs === '_value') {
-          this.element.innerHTML = this.configuredElement._value
+          this.elementInEditor.innerHTML = this.configuredElement._value
           break;
         }
         if (this.configuredElement[confAttrs]) {
-          this.element.setAttribute(confAttrs, this.configuredElement[confAttrs]);
+          this.elementInEditor.setAttribute(confAttrs, this.configuredElement[confAttrs])
         }
       }
+
+      this.element.parentNode.replaceChild(this.elementInEditor, this.element)
+      this.initialValue = this.configuredElement
+      
       this.$root.$emit('modelChanged')
+      this.$emit('open-editor',  { element: this.elementInEditor, required: this.elementRequired, parentDescription: this.parentDesctiption })
     },
     getComponentForAttribute(attr) {
       if (attr.values) {

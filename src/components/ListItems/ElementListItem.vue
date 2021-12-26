@@ -74,6 +74,7 @@ export default {
       return this.element.getAttribute('name')
     },
     hasArrays() {
+      this.timestamp
       return this.desc.arrays.length
     },
     childArrays() {

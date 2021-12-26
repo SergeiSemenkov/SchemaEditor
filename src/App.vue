@@ -18,6 +18,7 @@
     </v-app-bar>
     <v-navigation-drawer
       app
+      permanent
       width="500"
       v-if="xmlDoc"
     >
@@ -31,53 +32,29 @@
       <template v-if="!xmlDoc">
         <v-row>
           <v-col cols=6 offset=3 class="mt-6">
-            <v-stepper
-              v-model="stepperValue"
-              vertical
-            >
-              <v-stepper-step
-                :complete="stepperValue > 1"
-                step="1"
-              >
-                Upload a schema description
-              </v-stepper-step>
-
-              <v-stepper-content step="1">
-                  <v-file-input
-                    v-model="descriptionFile"
-                    accept=".xml"
-                    label="Select schema description"
-                  ></v-file-input>
-                  <v-btn
-                    color="primary"
-                    @click="loadDescriptionFile"
-                  >
-                    Continue
-                  </v-btn>
-              </v-stepper-content>
-
-              <v-stepper-step
-                step="2"
-                :complete="stepperValue > 2"
-              >
-                Upload a schema
-              </v-stepper-step>
-
-              <v-stepper-content step="2">
-                <v-file-input
-                  v-model="schemaFile"
-                  accept=".xml"
-                  label="Select schema"
-                ></v-file-input>
+            <v-card>
+              <v-card-title>
+                Upload a schema file
+              </v-card-title>
+              <v-file-input
+                v-model="schemaFile"
+                class="mx-4"
+                accept=".xml"
+                label="Select schema"
+              ></v-file-input>
+              <v-divider></v-divider>
+              <v-card-actions>
                 <v-btn
+                  text
                   color="primary"
+                  class="ml-2"
                   @click="loadSchemaFile"
                 >
                   Continue
                 </v-btn>
-              </v-stepper-content>
-            </v-stepper>
-          </v-col>
+              </v-card-actions>
+            </v-card>
+          </v-col> 
         </v-row>
       </template>
       <xml-element-editor
@@ -85,16 +62,19 @@
         :element="elementInEditor"
         :key="elementInEditor.tagName + elementInEditor.getAttribute('name')"
         :elementRequired="elementInEditorRequired"
+        :parentDesctiption="elementInEditorParentDescription"
         @close="elementInEditor = null"
+        @open-editor="openEditor"
       />
     </v-main>
   </v-app>
 </template>
 
 <script>
-import ElementTree from './components/ElementTree.vue';
-import XmlElementEditor from './components/XmlElementEditor.vue';
+import ElementTree from './components/ElementTree.vue'
+import XmlElementEditor from './components/XmlElementEditor.vue'
 import xmlDescriptionMixin from './mixins/xmlDescriptionMixin'
+import description from '../public/Mondrian.xml'
 import { parseXmlModel } from './utils/xmlModelParser'
 
 export default {
@@ -123,6 +103,13 @@ export default {
     this.$root.$on('modelChanged', () => {
       this.updateTimestamp = Date.now()
     })
+
+    const xmlModelContent = description
+    const parser = new DOMParser()
+  
+    const modelDoc = parser.parseFromString(xmlModelContent, "text/xml")
+    const jsModel = parseXmlModel(modelDoc)
+    this.loadDescription(jsModel)
   },
 
   methods: {
@@ -133,21 +120,11 @@ export default {
 
       this.xmlDoc = parser.parseFromString(xmlContent, "text/xml")
     },
-    async loadDescriptionFile() {
-      if (!this.descriptionFile) return;
-      const xmlModelContent = await this.descriptionFile.text()
-      const parser = new DOMParser()
-    
-      const modelDoc = parser.parseFromString(xmlModelContent, "text/xml")
-      const jsModel = parseXmlModel(modelDoc)
-      this.loadDescription(jsModel)
-
-      this.stepperValue++;
-    },
     openEditor(payload) {
-      const { element, required } = payload
+      const { element, required, parentDescription } = payload
       this.elementInEditor = element
       this.elementInEditorRequired = required
+      this.elementInEditorParentDescription = parentDescription
     },
     downloadSchema() {
       const serializer = new XMLSerializer

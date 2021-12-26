@@ -3,7 +3,11 @@
     <v-list-item-group
       color="primary"
     >
-      <v-subheader>Schema </v-subheader>
+      <v-row class="align-center black--text py-1">
+        <v-col cols=10 class="capitalize">
+          Schema
+        </v-col>
+      </v-row>
       <v-divider />
       <element-list-item
         :element="schema"

@@ -96,6 +96,7 @@ export default {
       return this.element.getAttribute('name')
     },
     hasArrays() {
+      this.timestamp
       return this.desc.arrays.length
     },
     childArrays() {
@@ -147,7 +148,7 @@ export default {
         return
       }
 
-      this.$emit('open-editor', { element: el, required: obj.required === 'true' })
+      this.$emit('open-editor', { element: el, required: obj.required === 'true', parentDescription: obj })
     }
   }
 }

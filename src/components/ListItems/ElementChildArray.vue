@@ -1,18 +1,22 @@
 <template>
   <div style="margin-bottom: 2rem;">
-    <v-subheader inset class="capitalize">
-      {{ arrayDescription.name }}
+    <v-row class="align-center black--text py-1">
+      <v-col cols=10 class="capitalize">
+        {{ arrayDescription.name }}
+      </v-col>
       <v-spacer />
-      <v-btn
-        icon
-        @click="openNewItemModal"
-      >
-        <v-icon>mdi-plus</v-icon>
-      </v-btn>
-    </v-subheader>
-    <v-divider />
+      <v-col cols=2>
+        <v-btn
+          icon
+          @click="openNewItemModal"
+        >
+          <v-icon>mdi-plus</v-icon>
+        </v-btn>
+      </v-col>
+    </v-row>
     <element-list-item
       v-for="(item, idx) in arrayItems" 
+      class="child_item"
       :key="`${arrayDescription.type}-${getElementName(item)}-${idx}`"
       :element="item"
       :timestamp="timestamp"
@@ -100,6 +104,9 @@ export default {
       return element.getAttribute('name')
     },
     openChildElement(payload) {
+      if (!payload.parentDescription) {
+        payload.parentDescription = this.arrayDescription
+      }
       this.$emit('open-editor', payload)
     },
     openNewItemModal() {
@@ -163,5 +170,9 @@ export default {
 
 .capitalize {
   text-transform: capitalize;
+}
+
+.child_item {
+  border-left: 1px solid rgba(0, 0, 0, 0.12);;
 }
 </style>>
