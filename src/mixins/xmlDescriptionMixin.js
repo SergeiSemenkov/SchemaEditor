@@ -26,6 +26,8 @@ export default {
 
 
       if (desc.parent) {
+        mergedDesc.parentClassName = desc.parentClassName
+
         const parentDesc = this.getMergedDescription(desc.parent)
 
         // Merge attributes

@@ -21,7 +21,7 @@
     <div v-if="opened" class="element_tree_item">
       <element-child-object
         v-for="(item, idx) in childObjects" 
-        :key="`${item.type}-${item.name}-${idx}`"
+        :key="getObjectKey(item, idx)"
         :obj="item"
         :timestamp="timestamp"
         @open-editor="openChildElement"
@@ -117,7 +117,7 @@ export default {
       return this.getElementsOfType(type)
     },
     createObject(obj) {
-      const currentObjDesc = this.desc.objects.find((e) => e.type === obj.type)
+      const currentObjDesc = this.desc.objects.find((e) => e.type === obj.type || e.type === obj.parentClassName)
       const objectsBefore = this.desc.objects.filter((e) => e.index < currentObjDesc.index)
       let itemInserted = false
       if (objectsBefore.length) {
@@ -141,6 +141,9 @@ export default {
       }
       
       this.$root.$emit('modelChanged')
+    },
+    getObjectKey(item, idx) {
+      return `${item?.element?.tagName || item.type}-${item.name}-${idx}`
     }
   }
 }

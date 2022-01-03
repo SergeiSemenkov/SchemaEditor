@@ -19,7 +19,7 @@
             icon
             small
             v-if="!obj.element"
-            @click.stop.prevent="createObject"
+            @click.stop.prevent="dialogOpened = true"
           >
             <v-icon
               v-text="'mdi-plus'"
@@ -49,6 +49,7 @@
         :obj="item"
         :timestamp="timestamp"
         @open-editor="openChildElement"
+        @create-object="createChildObject"
       />
       <element-child-array
         v-for="childArray in childArrays"
@@ -60,6 +61,37 @@
       />
       <!-- <v-divider /> -->
     </div>
+     <v-dialog
+      v-model="dialogOpened"
+      width="500"
+    >
+      <v-card>
+        <v-card-title class="text-h5 grey lighten-2">
+          Add new element
+        </v-card-title>
+
+        <v-card-text>
+          <v-select
+            v-model="newItemType"
+            :items="possibleElements"
+            label="Select element type"
+          ></v-select>
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="primary"
+            text
+            @click="addNewItem"
+          >
+            Add
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -87,10 +119,15 @@ export default {
   data() {
     return {
       opened: false,
-      desc: this.getDescriptionForElement(this.obj.type)
+      desc: this.getDescriptionForElement(this.obj?.element?.tagName || this.obj.type),
+      dialogOpened: false,
+      newItemType: null,
     }
   },
   computed: {
+    type() {
+      return this.obj?.element?.tagName || this.obj.type
+    },
     name() {
       this.timestamp
       return this.element.getAttribute('name')
@@ -108,21 +145,24 @@ export default {
       this.timestamp
       const arrays = this.desc.objects.map(obj => {
         const possibleElements = this.getPossibleElements(obj.type)
-        const element = this.element.querySelector(`:scope > ${possibleElements.join(', :scope >')}`)
-
+        const element = this.obj.element.querySelector(`:scope > ${possibleElements.join(', :scope >')}`)
         return {
           ...obj,
-          element
+         element
         }
       });
       return arrays
     },
     iconName() {
       this.timestamp
-      if (this.element.tagName === 'Cube') {
+      if (this.obj.element.tagName === 'Cube') {
         return 'mdi-cube';
       }
       return 'mdi-xml';
+    },
+    possibleElements() {
+      this.timestamp
+      return this.getElementsOfType(this.obj.type)
     }
   },
   methods: {
@@ -130,7 +170,7 @@ export default {
       this.$emit('update')
     },
     openItem() {
-      this.$emit('open-editor',  { element: this.element })
+      this.$emit('open-editor',  { element: this.obj.element })
     },
     openChildElement(item) {
       this.$emit('open-editor', item)
@@ -138,8 +178,44 @@ export default {
     getPossibleElements(type) {
       return this.getElementsOfType(type)
     },
-    createObject() {
-      this.$emit('create-object', this.obj)
+    createChildObject(obj) {
+      const currentObjDesc = this.desc.objects.find((e) => e.type === obj.type || e.type === obj.parentClassName)
+      const objectsBefore = this.desc.objects.filter((e) => e.index < currentObjDesc.index)
+      let itemInserted = false
+      if (objectsBefore.length) {
+        const el = document.createElementNS(null, obj.type)
+
+        for (let i = objectsBefore.length - 1; i >= 0; i--) {
+          const tmpObj = objectsBefore[i]
+
+          const possibleElements = this.getPossibleElements(tmpObj.type)
+          const objElement = this.obj.element.querySelector(`:scope > ${possibleElements.join(', :scope >')}`)
+          if (objElement) {
+            objElement.insertAdjacentElement('afterend', el)
+            itemInserted = true
+          }
+        }
+      }
+
+      if (!itemInserted) {
+        const el = document.createElementNS(null, obj.type)
+        this.obj.element.insertAdjacentElement('afterbegin', el)
+      }
+      
+      this.$root.$emit('modelChanged')
+    },
+    addNewItem() {
+      if (this.newItemType) {
+        this.dialogOpened = false
+        const type = this.newItemType
+        this.newItemType = null
+        const { parentClassName } = this.getDescriptionForElement(type)
+
+        this.$emit('create-object', {
+          type,
+          parentClassName
+        })
+      }
     },
     openObject(obj) {
       let el = obj.element

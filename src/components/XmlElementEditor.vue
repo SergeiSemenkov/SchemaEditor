@@ -17,7 +17,6 @@
             <v-spacer />
             <v-col cols=3>
               <v-btn
-                v-if="!elementRequired"
                 block
                 color="error"
                 @click="confirmationDialog = true"
