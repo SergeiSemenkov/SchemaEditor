@@ -96,7 +96,7 @@ export default {
     },
     possibleElements() {
       this.timestamp
-      return this.getElementsOfType(this.arrayDescription.type)
+      return this.getElementsOfType(this.arrayDescription.type).filter(e => !e.abstract)
     }
   },
   methods: {

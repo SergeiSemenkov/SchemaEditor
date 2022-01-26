@@ -69,7 +69,7 @@ export default {
     getElementsOfType(type) {
       const result = []
       descriptions.forEach((val, key) => {
-        if (val.isInstanceOf(type)) {
+        if (val.isInstanceOf(type) && !val.abstract) {
           result.push(key)
         }
       })

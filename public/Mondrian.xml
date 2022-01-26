@@ -1006,6 +1006,12 @@ Revision is $Id$
                 for backwards compatibility, but is deprecated because XML
                 enumerated attributes in a DTD cannot legally contain spaces.)
             </Doc>
+            <Value>sum</Value>
+            <Value>count</Value>
+            <Value>min</Value>
+            <Value>max</Value>
+            <Value>avg</Value>
+            <Value>distinct-count</Value>
         </Attribute>
         <Attribute name="formatter" required="false">
             <Doc>

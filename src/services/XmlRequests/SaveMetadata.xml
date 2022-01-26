@@ -1,0 +1,16 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+<soap:Header></soap:Header>
+  <soap:Body>
+    <Execute xmlns="urn:schemas-microsoft-com:xml-analysis">
+      <Command>
+        <Alter ObjectExpansion="ExpandFull" xmlns="http://schemas.microsoft.com/analysisservices/2003/engine">
+          <Object>
+        <DatabaseID>{{ DatabaseID }}</DatabaseID>
+          </Object>
+          <ObjectDefinition>{{ Schema }}</ObjectDefinition>
+        </Alter>
+      </Command>
+      <Properties><PropertyList/></Properties>
+    </Execute>
+  </soap:Body>
+</soap:Envelope>

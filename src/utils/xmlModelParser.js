@@ -1,6 +1,5 @@
 export function parseXmlModel(model) {
   const jsObjectModel = {}
-  window.model = model
   const elementsArray = model.querySelectorAll('Model > Element')
   // const classesArray = model.querySelectorAll('Model > Class')
 
@@ -11,7 +10,8 @@ export function parseXmlModel(model) {
       arrays: getArraysForElements(element),
       objects: getObjectsForElements(element),
       doc: element.querySelector('Doc')?.innerHTML,
-      hasValue: !!element.querySelector('CData')
+      hasValue: !!element.querySelector('CData'),
+      abstract: element.getAttribute('abstract') === 'true'
     }
   });
 
@@ -35,6 +35,7 @@ export function parseXmlModel(model) {
     }
   })
 
+  window.model = jsObjectModel
   return jsObjectModel
 }
 
@@ -96,4 +97,33 @@ function getObjectsForElements (element) {
   })
 
   return parsedObjs
+}
+
+export function createXPathFromElement(elm, doc) { 
+  var allNodes = doc.getElementsByTagName('*'); 
+  for (var segs = []; elm && elm.nodeType == 1; elm = elm.parentNode) 
+  { 
+    if (elm.hasAttribute('id')) { 
+      var uniqueIdCount = 0; 
+      for (var n=0;n < allNodes.length;n++) { 
+        if (allNodes[n].hasAttribute('id') && allNodes[n].id == elm.id) uniqueIdCount++; 
+        if (uniqueIdCount > 1) break; 
+      } 
+      if ( uniqueIdCount == 1) { 
+        segs.unshift('id("' + elm.getAttribute('id') + '")'); 
+        return segs.join('/'); 
+      } else { 
+        segs.unshift(elm.localName.toLowerCase() + '[@id="' + elm.getAttribute('id') + '"]'); 
+      } 
+    } else if (elm.hasAttribute('class')) { 
+      segs.unshift(elm.localName.toLowerCase() + '[@class="' + elm.getAttribute('class') + '"]'); 
+    } else { 
+      let i = 1
+      for (let sib = elm.previousSibling; sib; sib = sib.previousSibling) { 
+        if (sib.localName == elm.localName)  i++; 
+      } 
+      segs.unshift(elm.localName.toLowerCase() + '[' + i + ']'); 
+    }
+  }
+  return segs.length ? '/' + segs.join('/') : null; 
 }

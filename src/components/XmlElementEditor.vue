@@ -11,7 +11,7 @@
       <v-row class="flex-wrap ma-4">
         <v-col cols=12>
           <v-row>
-            <v-col cols=6>
+            <v-col cols=9>
               <h2>Edit element</h2>
             </v-col>
             <v-spacer />
@@ -24,29 +24,10 @@
                 Delete
               </v-btn>
             </v-col>
-            <v-col cols=3>
-              <v-btn
-                block
-                :disabled="!hasChanges"
-                @click="saveChanges"
-              >
-                Save
-              </v-btn>
-            </v-col>
           </v-row>
           <v-row>
             <v-col cols=6>
               <h2>Type: {{ elementType }}</h2>
-            </v-col>
-            <v-spacer />
-            <v-col cols=6>
-              <v-btn
-                v-if="possibleElements"
-                block
-                @click="openChangeTypeModal"
-              >
-                Change type
-              </v-btn>
             </v-col>
           </v-row>
         </v-col>
@@ -66,11 +47,12 @@
                 >
                   <component
                     :is="getComponentForAttribute(attribute)"
-                    v-model="configuredElement[attribute.name]"
+                    :value="configuredElement[attribute.name]"
                     :label="attribute.name"
                     :items="attribute.values"
                     :rules="rules.required"
                     dense
+                    @change="updateXmlAttribute(attribute.name, $event)"
                   ></component>
                   <p class="mt-n2 text-caption" v-html="attribute.doc"></p>
                 </v-col>
@@ -92,10 +74,11 @@
                 >
                   <component
                     :is="getComponentForAttribute(attribute)"
-                    v-model="configuredElement[attribute.name]"
+                    :value="configuredElement[attribute.name]"
                     :label="attribute.name"
                     :items="attribute.values"
                     dense
+                    @change="updateXmlAttribute(attribute.name, $event)"
                   ></component>
                   <p class="mt-n2 text-caption" v-html="attribute.doc"></p>
                 </v-col>
@@ -110,15 +93,20 @@
             <v-card-title>Element value</v-card-title>
             <div class="ma-4">
               <v-textarea
+                ref="textArea"
                 v-model="configuredElement._value"
                 label="Value of the element"
+                @change="updateXmlValue"
+                @focus="expandTextArea"
+                @input="expandTextArea"
+                @blur="shrinkTextArea"
               ></v-textarea>
             </div>
           </v-card>
         </v-col>
       </v-row>
     </v-col>
-     <v-dialog
+    <v-dialog
       v-model="confirmationDialog"
       width="500"
     >
@@ -148,40 +136,6 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog
-      v-model="changeTypeDialog"
-      width="500"
-    >
-      <v-card>
-        <v-card-title class="text-h5 grey lighten-2">
-          Change element type
-        </v-card-title>
-         <v-card-text class="pa-4">
-           <v-select
-            v-model="newElementType"
-            :items="possibleElements"
-            label="Select element type"
-          ></v-select>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="primary"
-            text
-            @click="changeTypeDialog = false"
-          >
-            Cancel
-          </v-btn>
-          <v-btn
-            color="success"
-            text
-            @click="changeType"
-          >
-            Change
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </v-row>
 </template>
 
@@ -199,14 +153,6 @@ export default {
     element: {
       type: Element,
       required: true
-    },
-    elementRequired: {
-      type: Boolean,
-      default: false
-    },
-    parentDesctiption: {
-      type: Object,
-      default: () => {}
     }
   },
   data() {
@@ -214,7 +160,7 @@ export default {
 
     const configuredElement = {}
     desc.attributes.forEach((e) => {
-      configuredElement[e.name] = this.element.getAttribute(e.name)
+      configuredElement[e.name] = e.type === 'Boolean' ? this.element.getAttribute(e.name) === 'true' : this.element.getAttribute(e.name)
     });
     if (desc.hasValue) {
       configuredElement._value = this.element.innerHTML
@@ -223,11 +169,8 @@ export default {
     initialValue = Object.assign({}, configuredElement);
     return {
       elementDesc: desc,
-      elementInEditor: this.element.cloneNode(),
       configuredElement,
       confirmationDialog: false,
-      changeTypeDialog: false,
-      possibleElements: this.parentDesctiption ? this.getElementsOfType(this.parentDesctiption.type) : null,
       newElementType: this.element.tagName,
       rules: {
         required: [
@@ -256,58 +199,33 @@ export default {
       return !_.isEqual(initialValue, this.configuredElement);
     },
     elementType() {
-      return this.elementInEditor.tagName
+      return this.element.tagName
     }
   },
   methods: {
-    openChangeTypeModal() {
-      this.changeTypeDialog = true
-    },
-    changeType() {
-      const newItem = document.createElementNS(null, this.newElementType)
-      const desc = this.getDescriptionForElement(this.newElementType)
+    updateXmlAttribute(attributeName, attributeValue) {
+      this.element.setAttribute(attributeName, attributeValue)
 
-      for(var i = 0; i < this.element.attributes.length; i++){
-        var nodeName  = this.element.attributes.item(i).nodeName;
-        var nodeValue = this.element.attributes.item(i).nodeValue;
-        if (desc.attributes.find(e => e.name === nodeName)) {
-          newItem.setAttribute(nodeName, nodeValue);
-        }
-      }
-
-      // Persist contents
-      newItem.innerHTML = this.element.innerHTML;
-
-      const configuredElement = {}
-      desc.attributes.forEach((e) => {
-        configuredElement[e.name] = newItem.getAttribute(e.name)
-      });
-      if (desc.hasValue) {
-        configuredElement._value = newItem.innerHTML
-      }
-
-      this.configuredElement = configuredElement
-      this.elementDesc = desc
-      this.elementInEditor = newItem
-
-      this.changeTypeDialog = false;
-    },
-    saveChanges() {
-      for (const confAttrs in this.configuredElement) {
-        if (confAttrs === '_value') {
-          this.elementInEditor.innerHTML = this.configuredElement._value
-          break;
-        }
-        if (this.configuredElement[confAttrs]) {
-          this.elementInEditor.setAttribute(confAttrs, this.configuredElement[confAttrs])
-        }
-      }
-
-      this.element.parentNode.replaceChild(this.elementInEditor, this.element)
-      this.initialValue = this.configuredElement
-      
       this.$root.$emit('modelChanged')
-      this.$emit('open-editor',  { element: this.elementInEditor, required: this.elementRequired, parentDescription: this.parentDesctiption })
+      this.$emit('open-editor',  { element: this.element })
+    },
+    updateXmlValue(value) {
+      this.element.innerHTML = value
+
+      this.$root.$emit('modelChanged')
+      this.$emit('open-editor',  { element: this.element })
+    },
+    expandTextArea() {
+      const textArea = this.$refs.textArea.$el.querySelector('textarea');
+      if (!textArea['data-prevHeight']) {
+        textArea['data-prevHeight'] = textArea.style.height;
+      }
+      textArea.style.height = textArea.scrollHeight + "px";
+    },
+    shrinkTextArea() {
+      const textArea = this.$refs.textArea.$el.querySelector('textarea');
+      textArea['data-prevHeight'] = null
+      textArea.style.height = textArea['data-prevHeight'];
     },
     getComponentForAttribute(attr) {
       if (attr.values) {
@@ -326,9 +244,6 @@ export default {
       this.$root.$emit('modelChanged')
       this.$emit('close')
     },
-    getArrayItems() {
-
-    }
   }
 }
 </script>
