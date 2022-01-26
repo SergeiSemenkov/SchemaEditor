@@ -53,7 +53,7 @@
         <v-spacer></v-spacer>
         <v-btn
           text
-          @click="$emit('close')"
+          @click="close"
         >
           Cancel
         </v-btn>
@@ -61,7 +61,7 @@
           text
           color="primary"
           :disabled="!canContinue"
-          @click="openSchema"
+          @click="saveSchema"
         >
           Continue
         </v-btn>
@@ -106,17 +106,24 @@ export default {
 
   },
   methods: {
-    openSchema() {
+    close() {
+      this.$emit('close')
+      this.saveToSamePlace = true
+      this.serverAddress = null || 'https://ssemenkoff.dev/emondrian/xmla'
+      this.schemaFile = null
+      this.tab = null
+    },
+    saveSchema() {
       if (this.tab === 'server') {
         if (this.loadedFromServer && this.saveToSamePlace) {
           this.$emit('saveToServer', null)
         } else {
           this.$emit('saveToServer', this.serverAddress)
         }
-        this.$emit('close')
+        this.close()
       } else if (this.tab === 'local') {
         this.$emit('saveToLocal', this.schemaFile)
-        this.$emit('close')
+        this.close()
       }
     }
   }

@@ -1,6 +1,7 @@
 <template>
   <v-dialog
     v-model="opened"
+    persistent
     width="500"
   >
     <v-card>
@@ -27,7 +28,7 @@
         <v-spacer></v-spacer>
         <v-btn
           text
-          @click="catalogSelectionDialog = false"
+          @click="cancel"
         >
           Cancel
         </v-btn>
@@ -35,7 +36,7 @@
           color="primary"
           text
           :disabled="!selectedCatalog"
-          @click="$emit('selectCatalog', selectedCatalog)"
+          @click="selectCatalog"
         >
           Select
         </v-btn>
@@ -82,6 +83,14 @@ export default {
         }
       })
     },
+    cancel() {
+      this.selectedCatalog = null
+      this.$emit('cancel')
+    },
+    selectCatalog() {
+      this.$emit('selectCatalog', this.selectedCatalog)
+      this.selectedCatalog = null
+    }
   }
 }
 </script>

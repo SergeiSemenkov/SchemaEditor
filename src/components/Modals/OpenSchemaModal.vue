@@ -48,7 +48,7 @@
         <v-spacer></v-spacer>
         <v-btn
           text
-          @click="$emit('close')"
+          @click="close"
         >
           Cancel
         </v-btn>
@@ -86,13 +86,19 @@ export default {
     }
   },
   methods: {
+    close() {
+      this.$emit('close')
+      this.serverAddress = null || 'https://ssemenkoff.dev/emondrian/xmla'
+      this.schemaFile = null
+      this.tab = null
+    },
     openSchema() {
       if (this.tab === 'server') {
         this.$emit('openFromServer', this.serverAddress)
-        this.$emit('close')
+        this.close()
       } else if (this.tab === 'local') {
         this.$emit('openFromLocal', this.schemaFile)
-        this.$emit('close')
+        this.close()
       }
     }
   }

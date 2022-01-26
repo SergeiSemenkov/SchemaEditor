@@ -178,6 +178,11 @@ export default {
       await this.$nextTick();
       this.$refs.elementTree.updateEditorState(element)
     },
+    async resetVisualComponents() {
+      this.elementInEditor = null
+      await this.$nextTick();
+      this.$refs.elementTree.updateEditorState(null)
+    },
     // Confirmation dialog
     confirm() {
       this.pendingConfirmationResolveFunction({ confirmed: true })
@@ -232,9 +237,7 @@ export default {
   
       this.editMode = 'new'
 
-      this.elementInEditor = null
-      await this.$nextTick();
-      this.$refs.elementTree.updateEditorState(null)
+      this.resetVisualComponents();
     },
     // Open schema functionality
     async openSchema() {
@@ -251,6 +254,8 @@ export default {
       this.editMode = 'local'
 
       this.lastSaveSchema = xmlContent
+
+      this.resetVisualComponents();
     },
     async openFromServer(serverAddress) {
       const { status, catalog } = await this.getCatalog(serverAddress)
@@ -264,6 +269,7 @@ export default {
         this.catalogSelectionDialog = false
 
         this.lastSaveSchema = schema.wholeText
+        this.resetVisualComponents();
       }
     },
     // Save schema functionality
@@ -272,7 +278,7 @@ export default {
     },
     async saveSchemaToServer(serverAddress) {
       let serverUrl = this.serverUrl
-      let catalogName = this.selectedCatalog.name
+      let catalogName = this.selectedCatalog?.name
       if (serverAddress) {
         serverUrl = serverAddress
         const { status, catalog } = await this.getCatalog(serverAddress)
