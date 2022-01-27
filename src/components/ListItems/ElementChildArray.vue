@@ -1,10 +1,19 @@
 <template>
   <div style="margin-bottom: 2rem;">
     <v-row class="align-center black--text py-1">
-      <v-col cols=10 class="capitalize">
+      <v-col cols=8 class="capitalize">
         {{ arrayDescription.name }}
       </v-col>
       <v-spacer />
+      <v-col cols=1>
+        <v-btn
+          v-if="canPaste"
+          icon
+          @click="pasteItem"
+        >
+          <v-icon>mdi-content-paste</v-icon>
+        </v-btn>
+      </v-col>
       <v-col cols=2>
         <v-btn
           icon
@@ -88,6 +97,10 @@ export default {
     },
   },
   computed: {
+    canPaste() {
+      if (!this.$root.$children[0].bufferElement) return false
+      return this.possibleElements.find(e => e === this.$root.$children[0].bufferElement.tagName)
+    },
     arrayItems() {
       this.timestamp
       
@@ -116,6 +129,32 @@ export default {
         this.newItemType = this.possibleElements[0];
         this.addNewItem();
       }
+    },
+    pasteItem() {
+      const createdElement = this.$root.$children[0].bufferElement.cloneNode(true)
+      const desc = this.getDescriptionForElement(this.element.tagName)
+
+      if (this.arrayItems.length) {
+        this.arrayItems[this.arrayItems.length - 1].insertAdjacentElement('afterend', createdElement)
+      } else {
+        const arraysBefore = desc.arrays.filter(e => e.index < this.arrayDescription.index)
+        let itemInserted = false
+        for (let i = arraysBefore.length - 1; i >= 0; i--) {
+          const tmpArray = arraysBefore[i]
+          const possibleElements = this.getElementsOfType(tmpArray.type)
+          const items = Array.from(this.element.querySelectorAll(`:scope > ${possibleElements.join(', :scope >')}`))
+          if (items.length) {
+            items[items.length - 1].insertAdjacentElement('afterend', createdElement)
+            itemInserted = true
+          }
+          break
+        }
+        if (!itemInserted) {
+          this.element.insertAdjacentElement('afterbegin', createdElement)
+        }
+      }
+      this.$root.$emit('modelChanged')
+      this.$emit('open-editor', { element: createdElement })
     },
     addNewItem() {
       if (this.newItemType) {

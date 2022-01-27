@@ -7,6 +7,11 @@
       <v-list-item-content>
         <v-list-item-title v-text="name"></v-list-item-title>
       </v-list-item-content>
+      <v-list-item-icon @click.stop.prevent="copyItem">
+        <v-icon
+          v-text="'mdi-content-copy'"
+        ></v-icon>
+      </v-list-item-icon>
       <v-list-item-icon @click.stop.prevent="opened=!opened">
         <v-icon
           v-if="hasArrays"
@@ -106,6 +111,9 @@ export default {
   methods: {
     update() {
       this.$emit('update')
+    },
+    copyItem() {
+      this.$root.$children[0].bufferElement = this.element
     },
     openItem() {
       this.$emit('open-editor',  { element: this.element })

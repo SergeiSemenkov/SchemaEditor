@@ -129,6 +129,8 @@ export default {
     pendingCatalogSelectionResolveFunction: null,
     // Save schema dialog
     saveSchemaDialog: false,
+    // Copy/paste
+    bufferElement: null,
   }),
 
   mounted() {
