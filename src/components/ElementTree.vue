@@ -45,7 +45,10 @@ export default {
     },
     updateEditorState(currentItem) {
       if (currentItem !== null) {
-        const listItems = this.$refs.listItems.items.map(i => i.$parent.element)
+        const listItems = this.$refs.listItems.items.map(i => {
+          if (i.$parent.obj) return i.$parent.obj.element
+          return i.$parent.element
+        })
         const index = listItems.indexOf(currentItem)
         this.$refs.listItems.internalLazyValue = index
 

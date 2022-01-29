@@ -156,14 +156,14 @@ export default {
     }
   },
   data() {
-    const desc = this.getDescriptionForElement(this.element.tagName)
+    const desc = this.getDescriptionForElement(this.element.tagName)  
 
     const configuredElement = {}
     desc.attributes.forEach((e) => {
       configuredElement[e.name] = e.type === 'Boolean' ? this.element.getAttribute(e.name) === 'true' : this.element.getAttribute(e.name)
     });
     if (desc.hasValue) {
-      configuredElement._value = this.element.innerHTML
+      configuredElement._value = this.element.innerHTML.replace('<![CDATA[', '').replace(']]>', '').trim();
     }
 
     initialValue = Object.assign({}, configuredElement);
@@ -210,7 +210,8 @@ export default {
       this.$emit('open-editor',  { element: this.element })
     },
     updateXmlValue(value) {
-      this.element.innerHTML = value
+      const wrappedValue = `\n<![CDATA[ \n ${value} \n ]]>\n`
+      this.element.innerHTML = wrappedValue
 
       this.$root.$emit('modelChanged')
       this.$emit('open-editor',  { element: this.element })
