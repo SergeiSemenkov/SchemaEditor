@@ -76,7 +76,7 @@
                     :is="getComponentForAttribute(attribute)"
                     :value="configuredElement[attribute.name]"
                     :label="attribute.name"
-                    :items="attribute.values"
+                    :items="getSelectionItems(attribute)"
                     dense
                     @change="updateXmlAttribute(attribute.name, $event)"
                   ></component>
@@ -143,6 +143,8 @@
 import _ from "lodash"
 import xmlDescriptionMixin from '../mixins/xmlDescriptionMixin'
 import { VTextField, VSwitch, VSelect } from 'vuetify/lib'
+import { getElementByXpathRelative } from '../utils/xPath'
+
 let initialValue = null;
 
 export default {
@@ -200,7 +202,7 @@ export default {
     },
     elementType() {
       return this.element.tagName
-    }
+    },
   },
   methods: {
     updateXmlAttribute(attributeName, attributeValue) {
@@ -232,12 +234,25 @@ export default {
       if (attr.values) {
         return VSelect
       }
+      if (attr.reference) {
+        return VSelect
+      }
       if (attr.type === 'String') {
         return VTextField
       } if (attr.type === 'Boolean') {
         return VSwitch
       }
       return VTextField
+    },
+    getSelectionItems(attr) {
+      if (attr.values) {
+        return attr.values
+      }
+      if (attr.reference) {
+        const doc = this.$root.$children[0].xmlDoc
+        const xPathResult = getElementByXpathRelative(attr.reference, doc, this.element).map(e => e ? e.getAttribute(attr.referenceAttribute) : '')
+        return xPathResult
+      }
     },
     removeItem() {
       this.confirmationDialog = false

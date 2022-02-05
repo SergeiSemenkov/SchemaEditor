@@ -89,7 +89,7 @@ import HasChangesModal from './components/Modals/HasChangesModal.vue'
 import OpenSchemaModal from './components/Modals/OpenSchemaModal.vue'
 import SaveSchemaModal from './components/Modals/SaveSchemaModal.vue'
 import CatalogSelectionModal from './components/Modals/CatalogSelectionModal.vue'
-import { createXPathFromElement } from './utils/xmlModelParser'
+import { createXPathFromElement } from './utils/xPath'
 
 export default {
   name: 'App',
