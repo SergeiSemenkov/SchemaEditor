@@ -23,10 +23,17 @@
       </v-btn>
       <v-btn
         v-if="xmlDoc"
-        class="px-2"
+        class="mx-2"
         @click="saveSchema"
       >
         Save
+      </v-btn>
+      <v-btn
+        v-if="xmlDoc"
+        class="mx-2"
+        @click="schemaValidationDialog = true"
+      >
+        Validate
       </v-btn>
     </v-app-bar>
     <v-navigation-drawer
@@ -44,6 +51,7 @@
     </v-navigation-drawer>
     <v-main>
       <xml-element-editor
+        ref="editor"
         v-if="elementInEditor"
         :element="elementInEditor"
         :key="getElementKey(elementInEditor)"
@@ -74,6 +82,12 @@
         @cancel="discardCatalogSelection"
         @selectCatalog="selectCatalog"
       />
+      <SchemaValidationModal
+        :opened="schemaValidationDialog"
+        @close="schemaValidationDialog = false"
+        @open-editor="openEditor"
+        @highlight-invalid-items="highlightInvalidItems"
+      />
     </v-main>
   </v-app>
 </template>
@@ -89,6 +103,7 @@ import HasChangesModal from './components/Modals/HasChangesModal.vue'
 import OpenSchemaModal from './components/Modals/OpenSchemaModal.vue'
 import SaveSchemaModal from './components/Modals/SaveSchemaModal.vue'
 import CatalogSelectionModal from './components/Modals/CatalogSelectionModal.vue'
+import SchemaValidationModal from './components/Modals/SchemaValidationModal.vue'
 import { createXPathFromElement } from './utils/xPath'
 
 export default {
@@ -102,6 +117,7 @@ export default {
     OpenSchemaModal,
     CatalogSelectionModal,
     SaveSchemaModal,
+    SchemaValidationModal,
   },
 
   mixins: [
@@ -131,6 +147,9 @@ export default {
     saveSchemaDialog: false,
     // Copy/paste
     bufferElement: null,
+    // Schema verification modal
+    schemaValidationDialog: false,
+    invalidElementSet: new Set(),
   }),
 
   mounted() {
@@ -174,15 +193,16 @@ export default {
       return xPath
     },
     async openEditor(payload) {
-      const { element } = payload
+      const { element, attribute } = payload
 
       this.elementInEditor = element
-      await this.$nextTick();
+      await this.$nextTick()
       this.$refs.elementTree.updateEditorState(element)
+      this.$refs.editor.focusOnAttribute(attribute)
     },
     async resetVisualComponents() {
       this.elementInEditor = null
-      await this.$nextTick();
+      await this.$nextTick()
       this.$refs.elementTree.updateEditorState(null)
     },
     // Confirmation dialog
@@ -325,6 +345,11 @@ export default {
       setTimeout(function() { URL.revokeObjectURL(tempLink.href); }, 1500);
 
       this.lastSaveSchema = text
+    },
+    // Validation functionality
+    highlightInvalidItems (items) {
+      this.invalidElementSet = items
+    //  this.$refs.elementTree.highlightInvalidItems(items)
     }
   }
 };

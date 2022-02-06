@@ -9,83 +9,89 @@
       offset=0
     >
       <v-row class="flex-wrap ma-4">
-        <v-col cols=12>
-          <v-row>
-            <v-col cols=9>
-              <h2>Edit element</h2>
-            </v-col>
-            <v-spacer />
-            <v-col cols=3>
-              <v-btn
-                block
-                color="error"
-                @click="confirmationDialog = true"
-              >
-                Delete
-              </v-btn>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols=6>
-              <h2>Type: {{ elementType }}</h2>
-            </v-col>
-          </v-row>
-        </v-col>
-        <v-col cols=12>
-          <span v-html="this.elementDesc.doc"></span>
-        </v-col>
-        <v-col cols=12 v-if="requiredAttributes.length">
-          <v-card>
-            <v-card-title>Required attributes</v-card-title>
-            <v-card-text>
-              <template
-                v-for="attribute in requiredAttributes"
-              >
-                <v-col
-                  :key="attribute.name"
-                  cols="12"
+        <v-form ref="form">
+          <v-col cols=12>
+            <v-row>
+              <v-col cols=9>
+                <h2>Edit element</h2>
+              </v-col>
+              <v-spacer />
+              <v-col cols=3>
+                <v-btn
+                  block
+                  color="error"
+                  @click="confirmationDialog = true"
                 >
-                  <component
-                    :is="getComponentForAttribute(attribute)"
-                    :value="configuredElement[attribute.name]"
-                    :label="attribute.name"
-                    :items="attribute.values"
-                    :rules="rules.required"
-                    dense
-                    @change="updateXmlAttribute(attribute.name, $event)"
-                  ></component>
-                  <p class="mt-n2 text-caption" v-html="attribute.doc"></p>
-                </v-col>
-              </template>
-            </v-card-text>
-          </v-card>
-        </v-col>
+                  Delete
+                </v-btn>
+              </v-col>
+            </v-row>
+            <v-row>
+              <v-col cols=6>
+                <h2>Type: {{ elementType }}</h2>
+              </v-col>
+            </v-row>
+          </v-col>
+          <v-col cols=12>
+            <span v-html="this.elementDesc.doc"></span>
+          </v-col>
+          <v-col cols=12 v-if="requiredAttributes.length">
+            <v-card>
+              <v-card-title>Required attributes</v-card-title>
+              <v-card-text>
+                <template
+                  v-for="attribute in requiredAttributes"
+                >
+                  <v-col
+                    :key="attribute.name"
+                    cols="12"
+                  >
+                    <component
+                      :ref="`editorField-${attribute.name}`"
+                      :is="getComponentForAttribute(attribute)"
+                      :value="configuredElement[attribute.name]"
+                      :label="attribute.name"
+                      :items="attribute.values"
+                      :rules="rules.required"
+                      dense
+                      clearable
+                      @change="updateXmlAttribute(attribute.name, $event)"
+                    ></component>
+                    <p class="mt-n2 text-caption" v-html="attribute.doc"></p>
+                  </v-col>
+                </template>
+              </v-card-text>
+            </v-card>
+          </v-col>
 
-        <v-col cols=12 v-if="optionalAttributes.length">
-          <v-card>
-            <v-card-title>Optional attributes</v-card-title>
-            <v-card-text>
-              <template
-                v-for="attribute in optionalAttributes"
-              >
-                <v-col
-                  :key="attribute.name"
-                  cols="12"
+          <v-col cols=12 v-if="optionalAttributes.length">
+            <v-card>
+              <v-card-title>Optional attributes</v-card-title>
+              <v-card-text>
+                <template
+                  v-for="attribute in optionalAttributes"
                 >
-                  <component
-                    :is="getComponentForAttribute(attribute)"
-                    :value="configuredElement[attribute.name]"
-                    :label="attribute.name"
-                    :items="getSelectionItems(attribute)"
-                    dense
-                    @change="updateXmlAttribute(attribute.name, $event)"
-                  ></component>
-                  <p class="mt-n2 text-caption" v-html="attribute.doc"></p>
-                </v-col>
-              </template>
-            </v-card-text>
-          </v-card>
-        </v-col>
+                  <v-col
+                    :key="attribute.name"
+                    cols="12"
+                  >
+                    <component
+                      :ref="`editorField-${attribute.name}`"
+                      :is="getComponentForAttribute(attribute)"
+                      :value="configuredElement[attribute.name]"
+                      :label="attribute.name"
+                      :items="getSelectionItems(attribute)"
+                      dense
+                      clearable
+                      @change="updateXmlAttribute(attribute.name, $event)"
+                    ></component>
+                    <p class="mt-n2 text-caption" v-html="attribute.doc"></p>
+                  </v-col>
+                </template>
+              </v-card-text>
+            </v-card>
+          </v-col>
+        </v-form>
       </v-row>
       <v-row class="flex-wrap ma-4" v-if="elementDesc.hasValue">
         <v-col cols=12>
@@ -157,6 +163,9 @@ export default {
       required: true
     }
   },
+  mounted() {
+    this.$refs.form.validate();
+  },
   data() {
     const desc = this.getDescriptionForElement(this.element.tagName)  
 
@@ -206,7 +215,7 @@ export default {
   },
   methods: {
     updateXmlAttribute(attributeName, attributeValue) {
-      this.element.setAttribute(attributeName, attributeValue)
+      this.element.setAttribute(attributeName, attributeValue === null ? '' : attributeValue)
 
       this.$root.$emit('modelChanged')
       this.$emit('open-editor',  { element: this.element })
@@ -234,7 +243,7 @@ export default {
       if (attr.values) {
         return VSelect
       }
-      if (attr.reference) {
+      if (attr.references) {
         return VSelect
       }
       if (attr.type === 'String') {
@@ -248,9 +257,14 @@ export default {
       if (attr.values) {
         return attr.values
       }
-      if (attr.reference) {
+      if (attr.references) {
         const doc = this.$root.$children[0].xmlDoc
-        const xPathResult = getElementByXpathRelative(attr.reference, doc, this.element).map(e => e ? e.getAttribute(attr.referenceAttribute) : '')
+        const refs = attr.references
+        let xPathResult = []
+        refs.forEach(r => {
+          const t = getElementByXpathRelative(r.xPath, doc, this.element).map(e => e ? e.getAttribute(r.attribute) : '')
+          xPathResult = xPathResult.concat(...t)
+        })
         return xPathResult
       }
     },
@@ -260,10 +274,11 @@ export default {
       this.$root.$emit('modelChanged')
       this.$emit('close')
     },
+    focusOnAttribute(attributeName) {
+      if (!attributeName) return
+      const field = this.$refs[`editorField-${attributeName}`][0]
+      field.focus()
+    }
   }
 }
 </script>
-
-<style>
-
-</style>

@@ -143,7 +143,7 @@ export default {
     },
     childObjects() {
       this.timestamp
-      const arrays = this.desc.objects.map(obj => {
+      const objects = this.desc.objects.map(obj => {
         const possibleElements = this.getPossibleElements(obj.type)
         const element = this.obj.element.querySelector(`:scope > ${possibleElements.join(', :scope >')}`)
         return {
@@ -151,7 +151,7 @@ export default {
          element
         }
       });
-      return arrays
+      return objects
     },
     iconName() {
       this.timestamp
@@ -230,7 +230,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 .openIcon {
   transition: transform 0.5 ease-in-out;
 }

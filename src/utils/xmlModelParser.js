@@ -55,6 +55,16 @@ function getAttributesForElement (element) {
         const values = Array.from(attr.querySelectorAll('Value')).map((e) => e.innerHTML)
         parsed.values = values
       }
+
+      if (attr.querySelector('Reference')) {
+        const refs = Array.from(attr.querySelectorAll('Reference')).map((e) => {
+          return {
+            xPath: e.getAttribute('xPath'),
+            attribute: e.getAttribute('attribute')
+          }
+        })
+        parsed.references = refs
+      }
     })
     
     parsedAttrs.push(parsed)

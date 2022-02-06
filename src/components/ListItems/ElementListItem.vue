@@ -1,6 +1,9 @@
 <template>
   <div>
-    <v-list-item @click.stop.prevent="openItem">
+    <v-list-item
+      @click.stop.prevent="openItem"
+      :class="hasErrors"
+    >
       <v-list-item-icon>
         <v-icon v-text="iconName"></v-icon>
       </v-list-item-icon>
@@ -29,6 +32,7 @@
         :key="getObjectKey(item, idx)"
         :obj="item"
         :timestamp="timestamp"
+        :class="getObjectClasses(item)"
         @open-editor="openChildElement"
         @create-object="createObject"
       />
@@ -106,6 +110,21 @@ export default {
         return 'mdi-cube';
       }
       return 'mdi-xml';
+    },
+    hasErrors() {
+      const elementsWithErrors = this.$root.$children[0].invalidElementSet
+      if (elementsWithErrors.has(this.element)) {
+        return 'element_has_errors element_has_errors_in_child'
+      }
+
+      let childHasError = false
+      const elementsWithErrorsArr = Array.from(elementsWithErrors)
+      elementsWithErrorsArr.forEach(e => {
+        if (this.element.contains(e)) {
+          childHasError = true
+        }
+      })
+      return childHasError ? 'element_has_errors_in_child' : ''
     }
   },
   methods: {
@@ -152,6 +171,16 @@ export default {
     },
     getObjectKey(item, idx) {
       return `${item?.element?.tagName || item.type}-${item.name}-${idx}`
+    },
+    getObjectClasses(obj) {
+      const elementsWithErrors = this.$root.$children[0].invalidElementSet
+      if (elementsWithErrors.has(this.element)) {
+        if (obj.required && !obj.element) {
+          return 'object_has_errors'
+        }
+      }
+
+      return ''
     }
   }
 }
@@ -177,4 +206,25 @@ export default {
 .element_tree_item {
   padding-left: 1.5rem;
 }
-</style>>
+
+.element_has_errors {
+  color: red !important;
+}
+
+
+.element_has_errors_in_child {
+  border-left: 3px solid red;
+  border-radius: 0 !important;
+}
+</style>
+
+<style>
+.object_has_errors .empty-object {
+  color: rgba(255, 0, 0, 0.4) !important;
+}
+
+.object_has_errors {
+  border-left: 3px solid red;
+  border-radius: 0 !important;
+}
+</style>
