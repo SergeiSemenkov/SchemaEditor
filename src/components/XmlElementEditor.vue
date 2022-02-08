@@ -51,7 +51,7 @@
                       :is="getComponentForAttribute(attribute)"
                       :value="configuredElement[attribute.name]"
                       :label="attribute.name"
-                      :items="attribute.values"
+                      :items="getSelectionItems(attribute)"
                       :rules="rules.required"
                       dense
                       clearable
@@ -262,6 +262,7 @@ export default {
         const refs = attr.references
         let xPathResult = []
         refs.forEach(r => {
+          console.log(r.attribute)
           const t = getElementByXpathRelative(r.xPath, doc, this.element).map(e => e ? e.getAttribute(r.attribute) : '')
           xPathResult = xPathResult.concat(...t)
         })
