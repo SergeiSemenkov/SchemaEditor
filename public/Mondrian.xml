@@ -413,6 +413,8 @@ Revision is $Id$
             Dimension within the context of a cube.
         </Doc>
         <Attribute name="source" required="true">
+            <Reference xPath="/ancestor::Schema/Dimension" attribute="name">
+            </Reference>
             <Doc>Name of the source dimension. Must be a dimension in
             this schema. Case-sensitive.</Doc>
         </Attribute>
