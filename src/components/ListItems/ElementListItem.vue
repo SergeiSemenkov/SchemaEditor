@@ -158,6 +158,17 @@ export default {
           if (objElement) {
             objElement.insertAdjacentElement('afterend', el)
             itemInserted = true
+
+            const itemIndex = Array.from(el.parentNode.children).indexOf(el)
+            const prevItem = el.parentNode.children[itemIndex - 1]
+            const prevItemNodeIndex = Array.from(el.parentNode.childNodes).indexOf(prevItem)
+            const prevItemSeparator = el.parentNode.childNodes[prevItemNodeIndex - 1]
+            let newtext = '\n'
+            if (prevItemSeparator.nodeType === 3) {
+              newtext = prevItemSeparator.textContent
+            }
+
+            el.insertAdjacentHTML('beforebegin', newtext)
           }
         }
       }
@@ -165,6 +176,18 @@ export default {
       if (!itemInserted) {
         const el = document.createElementNS(null, obj.type)
         this.element.insertAdjacentElement('afterbegin', el)
+
+        const elIndex = Array.from(this.element.parentNode.childNodes).indexOf(this.element)
+        const elSeparator = this.element.parentNode.childNodes[elIndex - 1]
+
+        let newtext = '\n'
+        if (elSeparator.nodeType === 3) {
+          newtext = elSeparator.textContent + '  '
+          newtext = newtext.replace(/\n+/, '\n')
+        }
+
+        el.insertAdjacentHTML('beforebegin', newtext)
+        el.insertAdjacentHTML('afterend', newtext)
       }
       
       this.$root.$emit('modelChanged')

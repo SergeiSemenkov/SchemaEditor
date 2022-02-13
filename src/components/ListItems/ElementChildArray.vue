@@ -136,6 +136,17 @@ export default {
 
       if (this.arrayItems.length) {
         this.arrayItems[this.arrayItems.length - 1].insertAdjacentElement('afterend', createdElement)
+
+        const itemIndex = Array.from(createdElement.parentNode.children).indexOf(createdElement)
+        const prevItem = createdElement.parentNode.children[itemIndex - 1]
+        const prevItemNodeIndex = Array.from(createdElement.parentNode.childNodes).indexOf(prevItem)
+        const prevItemSeparator = createdElement.parentNode.childNodes[prevItemNodeIndex - 1]
+        let newtext = '\n'
+        if (prevItemSeparator.nodeType === 3) {
+          newtext = prevItemSeparator.textContent
+        }
+
+        createdElement.insertAdjacentHTML('beforebegin', newtext)
       } else {
         const arraysBefore = desc.arrays.filter(e => e.index < this.arrayDescription.index)
         let itemInserted = false
@@ -146,11 +157,34 @@ export default {
           if (items.length) {
             items[items.length - 1].insertAdjacentElement('afterend', createdElement)
             itemInserted = true
+
+            const itemIndex = Array.from(createdElement.parentNode.children).indexOf(createdElement)
+            const prevItem = createdElement.parentNode.children[itemIndex - 1]
+            const prevItemNodeIndex = Array.from(createdElement.parentNode.childNodes).indexOf(prevItem)
+            const prevItemSeparator = createdElement.parentNode.childNodes[prevItemNodeIndex - 1]
+            let newtext = '\n'
+            if (prevItemSeparator.nodeType === 3) {
+              newtext = prevItemSeparator.textContent
+            }
+
+            createdElement.insertAdjacentHTML('beforebegin', newtext)
           }
           break
         }
         if (!itemInserted) {
           this.element.insertAdjacentElement('afterbegin', createdElement)
+
+          const elIndex = Array.from(this.element.parentNode.childNodes).indexOf(this.element)
+          const elSeparator = this.element.parentNode.childNodes[elIndex - 1]
+            
+          let newtext = '\n'
+          if (elSeparator.nodeType === 3) {
+            newtext = elSeparator.textContent + '  '
+            newtext = newtext.replace(/\n+/, '\n')
+          }
+
+          createdElement.insertAdjacentHTML('beforebegin', newtext)
+          createdElement.insertAdjacentHTML('afterend', newtext)
         }
       }
       this.$root.$emit('modelChanged')
@@ -168,6 +202,17 @@ export default {
 
         if (this.arrayItems.length) {
           this.arrayItems[this.arrayItems.length - 1].insertAdjacentElement('afterend', createdElement)
+
+          const itemIndex = Array.from(createdElement.parentNode.children).indexOf(createdElement)
+          const prevItem = createdElement.parentNode.children[itemIndex - 1]
+          const prevItemNodeIndex = Array.from(createdElement.parentNode.childNodes).indexOf(prevItem)
+          const prevItemSeparator = createdElement.parentNode.childNodes[prevItemNodeIndex - 1]
+          let newtext = '\n'
+          if (prevItemSeparator.nodeType === 3) {
+              newtext = prevItemSeparator.textContent
+          }
+
+          createdElement.insertAdjacentHTML('beforebegin', newtext)
         } else {
           const arraysBefore = desc.arrays.filter(e => e.index < this.arrayDescription.index)
           let itemInserted = false
@@ -180,12 +225,53 @@ export default {
             if (items.length) {
               items[items.length - 1].insertAdjacentElement('afterend', createdElement)
               itemInserted = true
+
+              const itemIndex = Array.from(createdElement.parentNode.children).indexOf(createdElement)
+              const prevItem = createdElement.parentNode.children[itemIndex - 1]
+              const prevItemNodeIndex = Array.from(createdElement.parentNode.childNodes).indexOf(prevItem)
+              const prevItemSeparator = createdElement.parentNode.childNodes[prevItemNodeIndex - 1]
+              let newtext = '\n'
+              if (prevItemSeparator.nodeType === 3) {
+                newtext = prevItemSeparator.textContent
+              }
+
+              createdElement.insertAdjacentHTML('beforebegin', newtext)
+              break
             }
-            break
           }
 
           if (!itemInserted) {
-            this.element.insertAdjacentElement('afterbegin', createdElement)
+            const objectsBefore = desc.objects
+            let objBefore = null
+
+            for (let i = objectsBefore.length - 1; i >= 0; i--) {
+              const tmpObj = objectsBefore[i]
+
+              const possibleElements = this.getElementsOfType(tmpObj.type)
+              const objBeforeQueryResult = this.element.querySelector(`:scope > ${possibleElements.join(', :scope >')}`)
+              if (objBeforeQueryResult) {
+                objBefore = objBeforeQueryResult
+                break
+              }
+            }
+
+            if (objBefore) {
+                objBefore.insertAdjacentElement('afterend', createdElement)
+            } else {
+              this.element.insertAdjacentElement('afterbegin', createdElement)
+              
+              const elIndex = Array.from(this.element.parentNode.childNodes).indexOf(this.element)
+              const elSeparator = this.element.parentNode.childNodes[elIndex - 1]
+              
+              let newtext = '\n'
+              if (elSeparator.nodeType === 3) {
+                newtext = elSeparator.textContent + '  '
+                newtext = newtext.replace(/\n+/, '\n')
+              }
+
+              createdElement.insertAdjacentHTML('beforebegin', newtext)
+              createdElement.insertAdjacentHTML('afterend', newtext)
+            }
           }
         }
 

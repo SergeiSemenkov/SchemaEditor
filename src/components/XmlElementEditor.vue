@@ -214,6 +214,13 @@ export default {
     },
   },
   methods: {
+    // sortAttributes() {
+    //   const reqAttrsStorage = this.requiredAttributes.map()
+    //   const optAttrsStorage = this.optionalAttributes.map()
+
+
+    //   this.a
+    // },
     updateXmlAttribute(attributeName, attributeValue) {
       this.element.setAttribute(attributeName, attributeValue === null ? '' : attributeValue)
 
@@ -262,7 +269,6 @@ export default {
         const refs = attr.references
         let xPathResult = []
         refs.forEach(r => {
-          console.log(r.attribute)
           const t = getElementByXpathRelative(r.xPath, doc, this.element).map(e => e ? e.getAttribute(r.attribute) : '')
           xPathResult = xPathResult.concat(...t)
         })
