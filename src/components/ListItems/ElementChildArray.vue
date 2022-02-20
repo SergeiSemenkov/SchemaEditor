@@ -1,26 +1,47 @@
 <template>
   <div style="margin-bottom: 2rem;">
-    <v-row class="align-center black--text py-1">
+    <v-row
+      class="align-center py-1"
+      :class="arrayItems.length ? 'black--text' : 'grey--text'"
+    >
       <v-col cols=8 class="capitalize">
         {{ arrayDescription.name }}
       </v-col>
       <v-spacer />
       <v-col cols=1>
-        <v-btn
-          v-if="canPaste"
-          icon
-          @click="pasteItem"
-        >
-          <v-icon>mdi-content-paste</v-icon>
-        </v-btn>
+         <v-tooltip
+            bottom
+          >
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                v-if="canPaste"
+                icon
+                v-bind="attrs"
+                v-on="on"
+                @click="pasteItem"
+              >
+                <v-icon>mdi-content-paste</v-icon>
+              </v-btn>
+            </template>
+            <span>Paste</span>
+          </v-tooltip>
       </v-col>
       <v-col cols=2>
-        <v-btn
-          icon
-          @click="openNewItemModal"
+        <v-tooltip
+          bottom
         >
-          <v-icon>mdi-plus</v-icon>
-        </v-btn>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              icon
+              v-bind="attrs"
+              v-on="on"
+              @click="openNewItemModal"
+            >
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+          </template>
+          <span>Add</span>
+        </v-tooltip>
       </v-col>
     </v-row>
     <element-list-item

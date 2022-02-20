@@ -10,21 +10,58 @@
       <v-list-item-content>
         <v-list-item-title v-text="name"></v-list-item-title>
       </v-list-item-content>
-      <v-list-item-icon @click.stop.prevent="copyItem">
-        <v-icon
-          v-text="'mdi-content-copy'"
-        ></v-icon>
-      </v-list-item-icon>
-      <v-list-item-icon @click.stop.prevent="opened=!opened">
-        <v-icon
-          v-if="hasArrays"
-          v-text="'mdi-chevron-down'"
-          :class="{
-            'openIcon': true,
-            'openIcon__opened': opened
-          }"
-        ></v-icon>
-      </v-list-item-icon>
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              icon
+              v-bind="attrs"
+              v-on="on"
+              @click.stop.prevent="copyItem"
+            >
+              <v-icon
+                v-text="'mdi-content-copy'"
+              ></v-icon>
+            </v-btn>
+          </template>
+          <span>Copy</span>
+        </v-tooltip>
+
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              icon
+              v-bind="attrs"
+              v-on="on"
+              @click.stop.prevent="deleteItem"
+            >
+              <v-icon
+                class="red--text text--lighten-2"
+                v-text="'mdi-delete'"
+              ></v-icon>
+            </v-btn>
+          </template>
+          <span>Delete</span>
+        </v-tooltip>
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            icon
+            v-bind="attrs"
+            v-on="on"
+            @click.stop.prevent="opened=!opened"
+          >
+            <v-icon
+              v-if="hasArrays"
+              v-text="'mdi-chevron-down'"
+              :class="{
+                'openIcon': true,
+                'openIcon__opened': opened
+              }"
+            ></v-icon>
+          </v-btn>
+        </template>
+        <span>{{ opened ? 'Collapse' : 'Expand' }}</span>
+      </v-tooltip>
     </v-list-item>
     <div v-if="opened" class="element_tree_item">
       <element-child-object
@@ -204,6 +241,9 @@ export default {
       }
 
       return ''
+    },
+    deleteItem() {
+      this.$root.$emit('removeItem', this.element)
     }
   }
 }

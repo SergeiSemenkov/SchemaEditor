@@ -21,21 +21,20 @@
                 <v-card-title>
                   Save schema to server
                 </v-card-title>
-                <template v-if="loadedFromServer">
+                <!-- <template v-if="loadedFromServer">
                   <p class="ml-4">
                     This schema was loaded from server
                   </p>
                   <v-checkbox
-                  class="ml-4"
+                    class="ml-4"
                     v-model="saveToSamePlace"
                     label="Save to the same place it's been loaded from"
                   />
-                </template>
+                </template> -->
                 <v-text-field
                   class="mx-4"
                   v-model="serverAddress"
-                  v-if="!loadedFromServer || !saveToSamePlace"
-                  label="Enter server address"
+                  label="XMLA server address"
                 ></v-text-field>
                 <v-divider></v-divider>
               </v-tab-item>
@@ -74,7 +73,7 @@
 export default {
   data() {
     return {
-      serverAddress: null || 'https://ssemenkoff.dev/emondrian/xmla',
+      serverAddress: this.serverUrl || process.env.NODE_ENV === "production" ? "../xmla" : 'https://ssemenkoff.dev/emondrian/xmla',
       schemaFile: null,
       tab: null,
       saveToSamePlace: true,
@@ -89,6 +88,14 @@ export default {
       type: Boolean,
       default: false,
     },
+    serverUrl: {
+      type: String,
+    }
+  },
+  watch: {
+    serverUrl() {
+      this.serverAddress = this.serverUrl || (process.env.NODE_ENV === "production" ? "../xmla" : 'https://ssemenkoff.dev/emondrian/xmla')
+    }
   },
   computed: {
     canContinue() {
@@ -108,8 +115,8 @@ export default {
   methods: {
     close() {
       this.$emit('close')
-      this.saveToSamePlace = true
-      this.serverAddress = null || 'https://ssemenkoff.dev/emondrian/xmla'
+      this.saveToSamePlace = false
+      this.serverAddress = this.serverUrl || (process.env.NODE_ENV === "production" ? "../xmla" : 'https://ssemenkoff.dev/emondrian/xmla'),
       this.schemaFile = null
       this.tab = null
     },

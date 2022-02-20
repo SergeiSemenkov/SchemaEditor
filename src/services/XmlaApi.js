@@ -20,7 +20,7 @@ export function fetchCatalogList(url) {
   };
 
   xhr.onerror = function (e) {
-    rejFn(e)
+    rejFn({ progressEvent: e, request: xhr })
   }
   xhr.send(DiscoverCatalogs);
 

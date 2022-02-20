@@ -2,8 +2,7 @@
   <v-app>
     <v-app-bar
       app
-      clipped-right
-      fixed
+      clipped-left
       color="primary"
       dark
     >
@@ -39,6 +38,7 @@
     <v-navigation-drawer
       app
       permanent
+      clipped
       width="500"
       v-if="xmlDoc"
     >
@@ -67,6 +67,7 @@
       <SaveSchemaModal
         :opened="saveSchemaDialog"
         :loadedFromServer="editMode === 'server'"
+        :serverUrl="serverUrl"
         @close="saveSchemaDialog = false"
         @saveToLocal="saveSchemaToLocalFile"
         @saveToServer="saveSchemaToServer"
@@ -88,6 +89,21 @@
         @open-editor="openEditor"
         @highlight-invalid-items="highlightInvalidItems"
       />
+      <ErrorModal
+        :message="errorMessage"
+        :opened="errorDialogOpened"
+        @close="errorDialogOpened = false"
+      />
+      <SuccessModal
+        :message="successMessage"
+        :opened="successDialogOpened"
+        @close="successDialogOpened = false"
+      />
+      <DeleteConfirmationModal
+        :opened="deleteElementDialogOpened"
+        @close="closeDeleteConfimation"
+        @confirm="removeElement"
+      />
     </v-main>
   </v-app>
 </template>
@@ -104,6 +120,9 @@ import OpenSchemaModal from './components/Modals/OpenSchemaModal.vue'
 import SaveSchemaModal from './components/Modals/SaveSchemaModal.vue'
 import CatalogSelectionModal from './components/Modals/CatalogSelectionModal.vue'
 import SchemaValidationModal from './components/Modals/SchemaValidationModal.vue'
+import ErrorModal from './components/Modals/ErrorModal.vue'
+import SuccessModal from './components/Modals/SuccessModal.vue'
+import DeleteConfirmationModal from './components/Modals/DeleteConfirmationModal.vue'
 import { createXPathFromElement } from './utils/xPath'
 
 export default {
@@ -118,6 +137,9 @@ export default {
     CatalogSelectionModal,
     SaveSchemaModal,
     SchemaValidationModal,
+    ErrorModal,
+    SuccessModal,
+    DeleteConfirmationModal,
   },
 
   mixins: [
@@ -150,6 +172,14 @@ export default {
     // Schema verification modal
     schemaValidationDialog: false,
     invalidElementSet: new Set(),
+    // Error dialog
+    errorDialogOpened: false,
+    errorMessage: '',
+    // Success dialog
+    successDialogOpened: false,
+    successMessage: '',
+    // Delete functionality
+    deleteElementDialogOpened: false
   }),
 
   mounted() {
@@ -158,6 +188,14 @@ export default {
 
     this.$root.$on('modelChanged', () => {
       this.updateTimestamp = Date.now()
+    })
+
+    this.$root.$on('errorMessage', (e) => {
+      this.openErrorModal(e)
+    })
+
+    this.$root.$on('removeItem', (e) => {
+      this.initiateItemDelete(e)
     })
 
     const xmlModelContent = description
@@ -284,14 +322,31 @@ export default {
       if (status === 'success') {        
         this.editMode = 'server'
         this.selectedCatalog = catalog
-        const metadata = await fetchSchemaForCatalog(serverAddress, catalog.name)
-        const schema = metadata.querySelector('row > METADATA').childNodes[0]
-        const parser = new DOMParser()
-        this.xmlDoc = parser.parseFromString(schema.wholeText, "text/xml")
-        this.catalogSelectionDialog = false
+        try {
+          const metadata = await fetchSchemaForCatalog(serverAddress, catalog.name)
 
-        this.lastSaveSchema = schema.wholeText
-        this.resetVisualComponents();
+          const isErrorResponce = metadata.querySelector('Fault')
+          if (isErrorResponce) {
+            const error = isErrorResponce.querySelector('detail > Error')
+            const errorMessage = error.getAttribute('Description')
+            const errorCode = error.getAttribute('ErrorCode')
+            throw new Error(`<b class="text-h6">Server returned error responce</b><br><b>Error code:</b> ${errorCode}<br><b>Error message:</b> ${errorMessage}`)
+          }
+
+          const schema = metadata.querySelector('row > METADATA').childNodes[0]
+          const parser = new DOMParser()
+          this.xmlDoc = parser.parseFromString(schema.wholeText, "text/xml")
+          this.catalogSelectionDialog = false
+          this.lastSaveSchema = schema.wholeText
+          this.resetVisualComponents();
+        } catch (e) {
+          this.catalogSelectionDialog = false
+          if (e.message) {
+            this.$root.$emit('errorMessage', e.message)
+          } else {
+            this.$root.$emit('errorMessage', '<b class="text-h6">Unable to load schema from the provided server</b>')
+          }
+        }
       }
     },
     // Save schema functionality
@@ -324,8 +379,32 @@ export default {
         .replaceAll('\t', '&#9;')
         .replaceAll('\n', '&#10;')
         .replaceAll('\r', '&#13;')
+      try {
+        const saveResponce = await saveSchemaToCatalog(serverUrl, catalogName, schemaEncoded)
 
-      await saveSchemaToCatalog(serverUrl, catalogName, schemaEncoded)
+        const isErrorResponce = saveResponce.querySelector('Fault')
+        if (isErrorResponce) {
+          const error = isErrorResponce.querySelector('detail > Error')
+          const errorMessage = error.getAttribute('Description')
+          const errorCode = error.getAttribute('ErrorCode')
+          throw new Error(`<b class="text-h6">Server returned error responce</b><br><b>Error code:</b> ${errorCode}<br><b>Error message:</b> ${errorMessage}`)
+        }
+
+        const successResponce = saveResponce.querySelector('ExecuteResponse')
+        if (successResponce) {
+          this.successMessage = `<b class="text-h6">Schema was succesfully saved</b>`
+          this.successDialogOpened = true
+        } else {
+          throw new Error('<b class="text-h6">Something went wrong while saving schema to the server</b>')
+        }
+      } catch (e) {
+        this.catalogSelectionDialog = false
+        if (e.message) {
+          this.$root.$emit('errorMessage', e.message)
+        } else {
+          this.$root.$emit('errorMessage', '<b class="text-h6">Unable to save schema to the provided server</b>')
+        }
+      }
       this.lastSaveSchema = schema
     },
     async saveSchemaToLocalFile() {
@@ -350,6 +429,31 @@ export default {
     highlightInvalidItems (items) {
       this.invalidElementSet = items
     //  this.$refs.elementTree.highlightInvalidItems(items)
+    },
+    // Error handling
+    openErrorModal(e) {
+      this.errorMessage = e
+      this.errorDialogOpened = true
+    },
+    // Remove item functionality
+    removeElement() {
+      const el = this.elementToRemove
+      el.parentNode.removeChild(el)
+
+      this.$root.$emit('modelChanged')
+      if (el === this.elementInEditor) {
+        this.elementInEditor = null
+      }
+      this.elementToRemove = null
+      this.deleteElementDialogOpened = false
+    },
+    closeDeleteConfimation() {
+      this.deleteElementDialogOpened = false
+      this.elementToRemove = null
+    },
+    initiateItemDelete(el) {
+      this.elementToRemove = el
+      this.deleteElementDialogOpened = true
     }
   }
 };

@@ -24,7 +24,7 @@
                 <v-text-field
                   class="mx-4"
                   v-model="serverAddress"
-                  label="Enter server address"
+                  label="XMLA server address"
                 ></v-text-field>
                 <v-divider></v-divider>
               </v-tab-item>
@@ -69,7 +69,7 @@
 export default {
   data() {
     return {
-      serverAddress: null || 'https://ssemenkoff.dev/emondrian/xmla',
+      serverAddress: process.env.NODE_ENV === "production" ? "../xmla" : 'https://ssemenkoff.dev/emondrian/xmla',
       schemaFile: null,
       tab: null,
     }
@@ -88,7 +88,7 @@ export default {
   methods: {
     close() {
       this.$emit('close')
-      this.serverAddress = null || 'https://ssemenkoff.dev/emondrian/xmla'
+      this.serverAddress = process.env.NODE_ENV === "production" ? "../xmla" : 'https://ssemenkoff.dev/emondrian/xmla',
       this.schemaFile = null
       this.tab = null
     },

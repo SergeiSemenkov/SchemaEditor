@@ -15,30 +15,48 @@
       </v-list-item-content>
       <v-list-item-icon>
         <div class="flex">
-          <v-btn
-            icon
-            small
+          <v-tooltip
             v-if="!obj.element"
-            @click.stop.prevent="dialogOpened = true"
+            bottom
           >
-            <v-icon
-              v-text="'mdi-plus'"
-            ></v-icon>
-          </v-btn>
-          <v-btn
-            icon
-            small
-            v-else-if="hasArrays || hasChildObjects"
-            @click.stop.prevent="opened=!opened"
-          >
-            <v-icon
-              v-text="'mdi-chevron-down'"
-              :class="{
-                'openIcon': true,
-                'openIcon__opened': opened
-              }"
-            ></v-icon>
-          </v-btn>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                icon
+                small
+                v-bind="attrs"
+                v-on="on"
+                @click.stop.prevent="dialogOpened = true"
+              >
+                <v-icon
+                  v-text="'mdi-plus'"
+                ></v-icon>
+              </v-btn>
+            </template>
+            <span>Add</span>
+          </v-tooltip>
+          <v-tooltip
+              v-else-if="hasArrays || hasChildObjects"
+              bottom
+            >
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                icon
+                small
+                v-bind="attrs"
+                v-on="on"
+                @click.stop.prevent="opened=!opened"
+              >
+                <v-icon
+                  v-text="'mdi-chevron-down'"
+                  :class="{
+                    'openIcon': true,
+                    'openIcon__opened': opened
+                  }"
+                ></v-icon>
+              </v-btn>
+            </template>
+            <span>{{ opened ? 'Collapse' : 'Expand' }}</span>
+          </v-tooltip>
         </div>
       </v-list-item-icon>
     </v-list-item>

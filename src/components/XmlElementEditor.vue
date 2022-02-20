@@ -12,19 +12,10 @@
         <v-form ref="form">
           <v-col cols=12>
             <v-row>
-              <v-col cols=9>
+              <v-col cols=12>
                 <h2>Edit element</h2>
               </v-col>
               <v-spacer />
-              <v-col cols=3>
-                <v-btn
-                  block
-                  color="error"
-                  @click="confirmationDialog = true"
-                >
-                  Delete
-                </v-btn>
-              </v-col>
             </v-row>
             <v-row>
               <v-col cols=6>
@@ -112,44 +103,15 @@
         </v-col>
       </v-row>
     </v-col>
-    <v-dialog
-      v-model="confirmationDialog"
-      width="500"
-    >
-      <v-card>
-        <v-card-title class="text-h5 grey lighten-2">
-          Remove element
-        </v-card-title>
-         <v-card-text class="pa-4">
-          Are you sure you want to remove the element?
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="primary"
-            text
-            @click="dialog = false"
-          >
-            Cancel
-          </v-btn>
-          <v-btn
-            color="error"
-            text
-            @click="removeItem"
-          >
-            Remove
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </v-row>
 </template>
 
 <script>
 import _ from "lodash"
 import xmlDescriptionMixin from '../mixins/xmlDescriptionMixin'
-import { VTextField, VSwitch, VSelect } from 'vuetify/lib'
+import { VTextField, VSelect } from 'vuetify/lib'
 import { getElementByXpathRelative } from '../utils/xPath'
+import RadioGroupEditor from "./Editors/RadioGroupEditor.vue"
 
 let initialValue = null;
 
@@ -163,6 +125,9 @@ export default {
       required: true
     }
   },
+  components: {
+    RadioGroupEditor
+  },
   mounted() {
     this.$refs.form.validate();
   },
@@ -171,7 +136,7 @@ export default {
 
     const configuredElement = {}
     desc.attributes.forEach((e) => {
-      configuredElement[e.name] = e.type === 'Boolean' ? this.element.getAttribute(e.name) === 'true' : this.element.getAttribute(e.name)
+      configuredElement[e.name] = e.type === 'Boolean' ? this.element.getAttribute(e.name) || 'none' : this.element.getAttribute(e.name)
     });
     if (desc.hasValue) {
       configuredElement._value = this.element.innerHTML.replace('<![CDATA[', '').replace(']]>', '').trim();
@@ -222,7 +187,12 @@ export default {
     //   this.a
     // },
     updateXmlAttribute(attributeName, attributeValue) {
-      this.element.setAttribute(attributeName, attributeValue === null ? '' : attributeValue)
+      const attr = this.elementDesc.attributes.find(e => e.name === attributeName)
+      if (attr.type === 'Boolean' && attributeValue === 'none') {
+        this.element.removeAttribute(attributeName)
+      } else {
+        this.element.setAttribute(attributeName, attributeValue === null ? '' : attributeValue)
+      }
 
       this.$root.$emit('modelChanged')
       this.$emit('open-editor',  { element: this.element })
@@ -256,11 +226,14 @@ export default {
       if (attr.type === 'String') {
         return VTextField
       } if (attr.type === 'Boolean') {
-        return VSwitch
+        return RadioGroupEditor
       }
       return VTextField
     },
     getSelectionItems(attr) {
+      if (attr.type === 'Boolean') {
+        return ['true', 'false', 'none']
+      }
       if (attr.values) {
         return attr.values
       }
@@ -274,12 +247,6 @@ export default {
         })
         return xPathResult
       }
-    },
-    removeItem() {
-      this.confirmationDialog = false
-      this.element.parentNode.removeChild(this.element)
-      this.$root.$emit('modelChanged')
-      this.$emit('close')
     },
     focusOnAttribute(attributeName) {
       if (!attributeName) return

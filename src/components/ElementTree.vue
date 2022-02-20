@@ -1,5 +1,5 @@
 <template>
-  <v-list dense nav>
+  <v-list dense nav v-if="schema">
     <v-list-item-group
       ref="listItems"
       color="primary"
@@ -36,7 +36,7 @@ export default {
   computed: {
     schema() {
       this.timestamp
-      return this.xmlDoc.querySelector("Schema")
+      return this.xmlDoc?.querySelector("Schema")
     },
   },
   methods: {

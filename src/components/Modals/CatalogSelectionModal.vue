@@ -6,12 +6,19 @@
   >
     <v-card>
       <v-card-title class="text-h5 grey lighten-2">
-        Select catalog to load schema from
+        Select catalog
       </v-card-title>
-      <v-card-text class="pa-4">
-        <v-list>
+      <v-card-text class="pa-4 text-center">
+        <v-progress-circular
+          v-if="isLoading"
+          :size="50"
+          color="primary"
+          indeterminate
+        ></v-progress-circular>
+        <v-list v-else>
           <v-list-item-group
             v-model="selectedCatalog"
+            class="text-left"
             color="blue"
           >
             <v-list-item
@@ -35,7 +42,7 @@
         <v-btn
           color="primary"
           text
-          :disabled="!selectedCatalog"
+          :disabled="!selectedCatalog || isLoading"
           @click="selectCatalog"
         >
           Select
@@ -60,9 +67,11 @@ export default {
     }
   },
   watch: {
-    async serverAddress(newVal) {
+    async opened(newVal) {
       if (newVal) {
-        this.catalogs = await this.fetchCatalogs(newVal)
+        this.isLoading = true
+        this.catalogs = await this.fetchCatalogs(this.serverAddress)
+        this.isLoading = false
       }
     }
   },
@@ -70,18 +79,37 @@ export default {
     return {
       catalogs: [],
       selectedCatalog: null,
+      isLoading: false,
     }
   },
   methods: {
     async fetchCatalogs(serverAddress) {
-      const responce = await fetchCatalogList(serverAddress)
-      const rows = responce.querySelectorAll('root > row')
-      return Array.from(rows).map(e => {
-        return {
-          name: e.querySelector('CATALOG_NAME').innerHTML,
-          node: e,
+      try {
+        const responce = await fetchCatalogList(serverAddress)
+
+        const isErrorResponce = responce.querySelector('Fault')
+        if (isErrorResponce) {
+          const error = isErrorResponce.querySelector('detail > Error')
+          const errorMessage = error.getAttribute('Description')
+          const errorCode = error.getAttribute('ErrorCode')
+          throw new Error(`<b class="text-h6">Server returned error responce</b><br><b>Error code:</b> ${errorCode}<br><b>Error message:</b> ${errorMessage}`)
         }
-      })
+
+        const rows = responce.querySelectorAll('root > row')
+        return Array.from(rows).map(e => {
+          return {
+            name: e.querySelector('CATALOG_NAME').innerHTML,
+            node: e,
+          }
+        })
+      } catch (e) {
+        this.$emit('cancel')
+        if (e.message) {
+          this.$root.$emit('errorMessage', e.message)
+        } else {
+          this.$root.$emit('errorMessage', '<b class="text-h6">Unable to load catalog list from the provided server</b>')
+        }
+      }
     },
     cancel() {
       this.selectedCatalog = null
