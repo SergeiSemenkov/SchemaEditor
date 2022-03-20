@@ -201,7 +201,18 @@ export default {
       return this.getElementsOfType(type)
     },
     createChildObject(obj) {
-      const currentObjDesc = this.desc.objects.find((e) => e.type === obj.type || e.type === obj.parentClassName)
+      const currentObjDesc = this.desc.objects.find((e) => {
+        if (e.type === obj.type) return true;
+        let parentClassName = obj.parentClassName
+        while (parentClassName) {
+          if (e.type === parentClassName) return true;
+          else {
+            let desc = this.getDescriptionForElement(parentClassName);
+            parentClassName = desc.parentClassName;
+          }
+        }
+        return false;
+      });
       const objectsBefore = this.desc.objects.filter((e) => e.index < currentObjDesc.index)
       let itemInserted = false
       if (objectsBefore.length) {
