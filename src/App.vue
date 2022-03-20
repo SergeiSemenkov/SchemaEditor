@@ -179,7 +179,7 @@ export default {
     successDialogOpened: false,
     successMessage: '',
     // Delete functionality
-    deleteElementDialogOpened: false
+    deleteElementDialogOpened: false,
   }),
 
   mounted() {

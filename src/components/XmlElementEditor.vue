@@ -12,10 +12,13 @@
         <v-form ref="form">
           <v-col cols=12>
             <v-row>
-              <v-col cols=12>
+              <v-col cols=6>
                 <h2>Edit element</h2>
               </v-col>
               <v-spacer />
+              <v-col cols=3 v-if="elementType === 'Cube'">
+                <v-btn block @click="diagramWindow = true">Open diagram</v-btn>
+              </v-col>
             </v-row>
             <v-row>
               <v-col cols=6>
@@ -103,6 +106,11 @@
         </v-col>
       </v-row>
     </v-col>
+    <DiagramModal
+      :opened="diagramWindow"
+      :cube="element"
+      @close="diagramWindow = false"
+    />
   </v-row>
 </template>
 
@@ -112,6 +120,7 @@ import xmlDescriptionMixin from '../mixins/xmlDescriptionMixin'
 import { VTextField, VSelect } from 'vuetify/lib'
 import { getElementByXpathRelative } from '../utils/xPath'
 import RadioGroupEditor from "./Editors/RadioGroupEditor.vue"
+import DiagramModal from './Modals/DiagramModal.vue'
 
 let initialValue = null;
 
@@ -126,7 +135,8 @@ export default {
     }
   },
   components: {
-    RadioGroupEditor
+    RadioGroupEditor,
+    DiagramModal,
   },
   mounted() {
     this.$refs.form.validate();
@@ -154,6 +164,8 @@ export default {
           // value => (value && value.length >= 3) || 'Min 3 characters',
         ],
       },
+      // Schema diagram
+      diagramWindow: false,
     }
   },
   computed: {
