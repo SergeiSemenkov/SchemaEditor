@@ -16,7 +16,7 @@
                 <h2>Edit element</h2>
               </v-col>
               <v-spacer />
-              <v-col cols=3 v-if="elementType === 'Cube'">
+              <v-col cols=3 v-if="elementType === 'Cube' || elementType === 'VirtualCube'">
                 <v-btn block @click="diagramWindow = true">Open diagram</v-btn>
               </v-col>
             </v-row>

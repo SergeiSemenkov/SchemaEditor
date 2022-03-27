@@ -32,12 +32,12 @@
           <template v-if="node.id !== 'cube'">
             <svg style="position: absolute; left: 10%; width: 80%; top: 0">
               <template v-for="(hier, i) in  getHierarchyList(node.data)">
-                <rect width=10000 height="30" :y="10 + i * 35" fill="green" :key="i">
+                <rect width=10000 height="30" :y="10 + i * 35" :fill="colors['Hierarchy']" :key="`${hier.getAttribute('name')}_rect`">
                 </rect>
-                <text x=5 :y="20 + i * 35" font-size="7" :key="i" fill="#fff">
+                <text x=5 :y="20 + i * 35" font-size="7" :key="`${hier.getAttribute('name')}_label`" fill="#fff">
                   Hierarchy {{  hier.getAttribute('name') || 'with no name' }}
                 </text>
-                <text x=5 :y="35 + i * 35" font-size="7" :key="i" fill="#fff" font-weight="bold">
+                <text x=5 :y="35 + i * 35" font-size="7" :key="`${hier.getAttribute('name')}_pKey`" fill="#fff" font-weight="bold">
                   {{  hier.getAttribute('primaryKey') }}
                 </text>
               </template>
@@ -45,6 +45,12 @@
           </template>
         </pre>
       </VueDiagramEditor>
+      <div style="position: fixed; bottom: 20px; right: 20px; padding: 30px; border: 1px solid black; border-radius: 10px; background-color: white;">
+        <div v-for="color in colorsDescriptions" :key="color[0]" style="padding: 5px;">
+          <span :style="`display: inline-block; width: 15px; height: 15px; background-color: ${color[1]}; margin-right: 10px;`"></span>
+          <span>{{ color[0] }}</span> 
+        </div>
+      </div>
     </v-card>
   </v-dialog>
 </template>
@@ -53,6 +59,15 @@
 import xmlDescriptionMixin from '../../mixins/xmlDescriptionMixin'
 import VueDiagramEditor from 'vue-diagram-editor';
 import 'vue-diagram-editor/dist/vue-diagram-editor.css';
+
+const colors = {
+  Dimension: '#657ED4',
+  VirtualCubeDimension: '#1E555C',
+  DimensionUsage: '#550C18',
+  Cube: '#0D0106',
+  VirtualCube: '#3A2E39',
+  Hierarchy: '#2BA84A',
+}
 
 export default {
   components: {
@@ -76,7 +91,9 @@ export default {
     nodes: {
     },
     links: {
-    }
+    },
+    colors,
+    colorsDescriptions: Object.entries(colors),
   }),
   watch: {
     async opened(newVal) {
@@ -95,7 +112,7 @@ export default {
       const items = Array.from(this.cube.querySelectorAll(`:scope > ${possibleElements.join(', :scope >')}`))
       
       const foreignKeys = items.reduce((acc, e) => {
-        const key = e.getAttribute('foreignKey')
+        const key = e.getAttribute('foreignKey') || 'Fact'
         const storedVal = acc.find(e => e.key === key);
         if (storedVal) {
           storedVal.count = storedVal.count + 1;
@@ -111,7 +128,7 @@ export default {
       this.nodes = []
       this.nodes.push({
         id: 'cube',
-        title: `Cube: ${ this.cube.getAttribute('name') }`,
+        title: `${this.cube.tagName}: ${ this.cube.getAttribute('name') }`,
         size: {
           width: 200,
           height: 40 + 10 * foreignKeys.length
@@ -120,6 +137,7 @@ export default {
           x: 200,
           y: 150
         },
+        data: this.cube,
         portsOut: {
         },
         portsIn: {
@@ -129,25 +147,31 @@ export default {
 
       let leftSide = 0;
       let rightSide = 0;
+      let leftSideHeirarchies = 0;
+      let rightSideHeirarchies = 0;
       let onLeftSide = true;
       for (let i = 0; i < foreignKeys.length; i++) {
         const el = foreignKeys[i];
         if (onLeftSide) {
           this.nodes[0].portsIn[`${el.key}`] = el.key
           leftSide += el.count
+          leftSideHeirarchies++;
 
           if (leftSide > rightSide) onLeftSide = !onLeftSide;
         } else {
           this.nodes[0].portsOut[`${el.key}`] = el.key
           rightSide += el.count
+          rightSideHeirarchies++;
 
           if (rightSide > leftSide) onLeftSide = !onLeftSide;
         }
       }
 
+      this.nodes[0].size.height = 40 + 17 * Math.max(rightSideHeirarchies, leftSideHeirarchies);
+
       items.sort((a, b) => {
-        const aFK = foreignKeys.find((e) => e.key === a.getAttribute('foreignKey'))
-        const bFK = foreignKeys.find((e) => e.key === b.getAttribute('foreignKey'))
+        const aFK = foreignKeys.find((e) => e.key === (a.getAttribute('foreignKey') || 'Fact'))
+        const bFK = foreignKeys.find((e) => e.key === (b.getAttribute('foreignKey') || 'Fact'))
 
         const aIndex = foreignKeys.indexOf(aFK)
         const bIndex = foreignKeys.indexOf(bFK)
@@ -158,7 +182,7 @@ export default {
       let leftSideHeight = 0;
       let rightSideHeight = 0;
       items.forEach((e, i) => {
-        const elForeignKey = e.getAttribute('foreignKey')
+        const elForeignKey = e.getAttribute('foreignKey') || 'Fact'
         const hierarchies = this.getHierarchyList(e);
         let height = 30 + 40 * hierarchies.length;
 
@@ -228,8 +252,23 @@ export default {
 
       this.$refs.diagram.$refs.diagram.spz.zoomAtPoint(0.3, {x: 50, y: 50})
     },
-    nodeColor() {
-      return '#00f';
+    nodeColor(node) {
+      const nodeType = node.data.tagName
+      console.log(nodeType);
+      switch (nodeType) {
+        case 'Dimension':
+          return colors['Dimension'];
+        case 'VirtualCubeDimension':
+          return colors['VirtualCubeDimension'];
+        case 'DimensionUsage':
+          return colors['DimensionUsage'];
+        case 'Cube':
+          return colors['Cube'];
+        case 'VirtualCube':
+          return colors['VirtualCube'];
+        default:
+          return colors['Cube'];
+      }
     },
     getHierarchyList(e) {
       const possibleElements = this.getElementsOfType("Hierarchy").filter(e => !e.abstract)
@@ -252,5 +291,9 @@ export default {
 
   g > svg > svg > text {
     font-size: 7px !important; 
+  }
+
+  svg > rect[fill-opacity] {
+    fill-opacity: 0;
   }
 </style>
