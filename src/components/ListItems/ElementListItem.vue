@@ -51,7 +51,6 @@
             @click.stop.prevent="opened=!opened"
           >
             <v-icon
-              v-if="hasArrays"
               v-text="'mdi-chevron-down'"
               :class="{
                 'openIcon': true,

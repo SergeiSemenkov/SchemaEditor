@@ -10,11 +10,11 @@
       <v-spacer />
       <v-col cols=1>
          <v-tooltip
+            v-if="canPaste"
             bottom
           >
             <template v-slot:activator="{ on, attrs }">
               <v-btn
-                v-if="canPaste"
                 icon
                 v-bind="attrs"
                 v-on="on"
