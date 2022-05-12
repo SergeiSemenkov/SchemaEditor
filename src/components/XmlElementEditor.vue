@@ -40,7 +40,30 @@
                     :key="attribute.name"
                     cols="12"
                   >
+                    <template v-if="attribute.linkedToSourceTable && serverAvailable">
+                      <v-row>
+                        <v-col align-self="center" cols="11">
+                          <v-text-field
+                            :label="attribute.name"
+                            :value="configuredElement[attribute.name]"
+                            @change="onTableManuallyChanged(attribute, $event)"
+                          ></v-text-field>
+                        </v-col>
+                        <v-col align-self="center" cols="1">
+                          <v-btn
+                            icon
+                            small
+                            @click="openSourceTableSelection(attribute)"
+                          >
+                            <v-icon
+                              v-text="'mdi-table'"
+                            ></v-icon>
+                          </v-btn>
+                        </v-col>
+                      </v-row>
+                    </template>
                     <component
+                      v-else
                       :ref="`editorField-${attribute.name}`"
                       :is="getComponentForAttribute(attribute)"
                       :value="configuredElement[attribute.name]"
@@ -111,16 +134,24 @@
       :cube="element"
       @close="diagramWindow = false"
     />
+    <SourceTableSelectionModal 
+      :opened="sourceTableDialogOpened"
+      :selected-attribute-value="attributeForSourceTableSelection ? configuredElement[attributeForSourceTableSelection.name] : ''"
+      @close="sourceTableDialogOpened = false"
+      @selectItem="selectItem"
+    />
   </v-row>
 </template>
 
 <script>
 import _ from "lodash"
 import xmlDescriptionMixin from '../mixins/xmlDescriptionMixin'
-import { VTextField, VSelect } from 'vuetify/lib'
+import { VTextField, VCombobox } from 'vuetify/lib'
 import { getElementByXpathRelative } from '../utils/xPath'
 import RadioGroupEditor from "./Editors/RadioGroupEditor.vue"
+import OptionalBooleanEditor from "./Editors/OptionalBooleanEditor.vue"
 import DiagramModal from './Modals/DiagramModal.vue'
+import SourceTableSelectionModal from './Modals/SourceTableSelectionModal.vue'
 
 let initialValue = null;
 
@@ -137,6 +168,8 @@ export default {
   components: {
     RadioGroupEditor,
     DiagramModal,
+    SourceTableSelectionModal,
+    OptionalBooleanEditor,
   },
   mounted() {
     this.$refs.form.validate();
@@ -166,6 +199,8 @@ export default {
       },
       // Schema diagram
       diagramWindow: false,
+      sourceTableDialogOpened: false,
+      attributeForSourceTableSelection: null,
     }
   },
   computed: {
@@ -189,6 +224,9 @@ export default {
     elementType() {
       return this.element.tagName
     },
+    serverAvailable() {
+      return this.$root.$children[0].editMode === 'server'
+    }
   },
   methods: {
     // sortAttributes() {
@@ -230,22 +268,19 @@ export default {
     },
     getComponentForAttribute(attr) {
       if (attr.values) {
-        return VSelect
+        return VCombobox
       }
       if (attr.references) {
-        return VSelect
+        return VCombobox
       }
       if (attr.type === 'String') {
         return VTextField
       } if (attr.type === 'Boolean') {
-        return RadioGroupEditor
+        return OptionalBooleanEditor
       }
       return VTextField
     },
     getSelectionItems(attr) {
-      if (attr.type === 'Boolean') {
-        return ['true', 'false', 'none']
-      }
       if (attr.values) {
         return attr.values
       }
@@ -264,6 +299,32 @@ export default {
       if (!attributeName) return
       const field = this.$refs[`editorField-${attributeName}`][0]
       field.focus()
+    },
+    async selectItem(item) {
+      if (!this.attributeForSourceTableSelection) return
+
+      const attributeName = this.attributeForSourceTableSelection.name
+      const attributeValue = item.tableName
+
+      this.configuredElement[attributeName] = attributeValue
+      this.element.setAttribute(attributeName, attributeValue === null ? '' : attributeValue)
+      
+      this.$root.$emit('modelChanged')
+      this.$emit('open-editor', { element: this.element })
+    },
+    onTableManuallyChanged(attribute, table) {
+      const attributeName = attribute.name
+      const attributeValue = table
+
+      this.configuredElement[attributeName] = attributeValue
+      this.element.setAttribute(attributeName, attributeValue === null ? '' : attributeValue)
+      
+      this.$root.$emit('modelChanged')
+      this.$emit('open-editor', { element: this.element })
+    },
+    openSourceTableSelection(attr) {
+      this.attributeForSourceTableSelection = attr
+      this.sourceTableDialogOpened = true
     }
   }
 }

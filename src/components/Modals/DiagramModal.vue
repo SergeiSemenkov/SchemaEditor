@@ -67,6 +67,7 @@ const colors = {
   Cube: '#0D0106',
   VirtualCube: '#3A2E39',
   Hierarchy: '#2BA84A',
+  'Fact Table': '#95190C',
 }
 
 export default {
@@ -112,7 +113,7 @@ export default {
       const items = Array.from(this.cube.querySelectorAll(`:scope > ${possibleElements.join(', :scope >')}`))
       
       const foreignKeys = items.reduce((acc, e) => {
-        const key = e.getAttribute('foreignKey') || 'Fact'
+        const key = e.getAttribute('foreignKey') || 'Fact Table'
         const storedVal = acc.find(e => e.key === key);
         if (storedVal) {
           storedVal.count = storedVal.count + 1;
@@ -170,8 +171,8 @@ export default {
       this.nodes[0].size.height = 40 + 17 * Math.max(rightSideHeirarchies, leftSideHeirarchies);
 
       items.sort((a, b) => {
-        const aFK = foreignKeys.find((e) => e.key === (a.getAttribute('foreignKey') || 'Fact'))
-        const bFK = foreignKeys.find((e) => e.key === (b.getAttribute('foreignKey') || 'Fact'))
+        const aFK = foreignKeys.find((e) => e.key === (a.getAttribute('foreignKey') || 'Fact Table'))
+        const bFK = foreignKeys.find((e) => e.key === (b.getAttribute('foreignKey') || 'Fact Table'))
 
         const aIndex = foreignKeys.indexOf(aFK)
         const bIndex = foreignKeys.indexOf(bFK)
@@ -182,7 +183,7 @@ export default {
       let leftSideHeight = 0;
       let rightSideHeight = 0;
       items.forEach((e, i) => {
-        const elForeignKey = e.getAttribute('foreignKey') || 'Fact'
+        const elForeignKey = e.getAttribute('foreignKey') || 'Fact Table'
         const hierarchies = this.getHierarchyList(e);
         let height = 30 + 40 * hierarchies.length;
 
@@ -244,13 +245,22 @@ export default {
       });
 
     },
-    init() {
+    async init() {
       this.$refs.diagram.setModel({
         nodes: this.nodes,
         links: this.links
       });
 
+      await this.$nextTick();
       this.$refs.diagram.$refs.diagram.spz.zoomAtPoint(0.3, {x: 50, y: 50})
+      const diagram = this.$refs.diagram.$el;
+      
+      diagram.querySelectorAll('text').forEach((e) => {
+        if (e.innerHTML.trim() === 'Fact Table') {
+          e.setAttribute('fill', colors['Fact Table']);
+        }
+      })
+      this.$refs.diagram.$refs.diagram.spz.setMinZoom(0.01)
     },
     nodeColor(node) {
       const nodeType = node.data.tagName

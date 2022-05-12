@@ -5,12 +5,16 @@
       <Command>
         <Alter ObjectExpansion="ExpandFull" xmlns="http://schemas.microsoft.com/analysisservices/2003/engine">
           <Object>
-        <DatabaseID>{{ DatabaseID }}</DatabaseID>
+            <DatabaseID>{{ DatabaseID }}</DatabaseID>
           </Object>
           <ObjectDefinition>{{ Schema }}</ObjectDefinition>
         </Alter>
       </Command>
-      <Properties><PropertyList/></Properties>
+      <Properties>
+        <PropertyList>
+          <ObjectType>Schema</ObjectType>
+        </PropertyList>
+      </Properties>
     </Execute>
   </soap:Body>
 </soap:Envelope>

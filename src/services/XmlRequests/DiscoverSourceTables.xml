@@ -1,0 +1,14 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header></soap:Header>
+  <soap:Body>
+    <Discover xmlns="urn:schemas-microsoft-com:xml-analysis">
+      <RequestType>DBSCHEMA_SOURCE_TABLES</RequestType>
+      <Restrictions>
+        <RestrictionList>
+          <TABLE_TYPE>TABLE</TABLE_TYPE>
+        </RestrictionList>
+      </Restrictions>
+      <Properties><PropertyList/></Properties>
+    </Discover>
+  </soap:Body>
+</soap:Envelope>

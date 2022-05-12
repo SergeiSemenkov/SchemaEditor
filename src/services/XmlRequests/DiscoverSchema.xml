@@ -1,0 +1,15 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Header></soap:Header>
+  <soap:Body>
+    <Discover xmlns="urn:schemas-microsoft-com:xml-analysis">
+      <RequestType>DISCOVER_XML_METADATA</RequestType>
+      <Restrictions>
+        <RestrictionList>
+          <DatabaseID>{{ DatabaseID }}</DatabaseID>
+          <ObjectType>Schema</ObjectType>
+        </RestrictionList>
+      </Restrictions>
+      <Properties><PropertyList/></Properties>
+    </Discover>
+  </soap:Body>
+</soap:Envelope>

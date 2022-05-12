@@ -32,6 +32,22 @@
               icon
               v-bind="attrs"
               v-on="on"
+              @click.stop.prevent="duplicateItem"
+            >
+              <v-icon
+                v-text="'mdi-content-duplicate'"
+              ></v-icon>
+            </v-btn>
+          </template>
+          <span>Duplicate</span>
+        </v-tooltip>
+
+        <v-tooltip bottom>
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              icon
+              v-bind="attrs"
+              v-on="on"
               @click.stop.prevent="deleteItem"
             >
               <v-icon
@@ -169,6 +185,11 @@ export default {
     },
     copyItem() {
       this.$root.$children[0].bufferElement = this.element
+    },
+    duplicateItem() {
+      const createdElement = this.element.cloneNode(true)
+      this.element.insertAdjacentElement('afterend', createdElement)
+      this.$root.$emit('modelChanged')
     },
     openItem() {
       this.$emit('open-editor',  { element: this.element })

@@ -5,7 +5,7 @@
       <RequestType>DISCOVER_XML_METADATA</RequestType>
       <Restrictions>
         <RestrictionList>
-          <DatabaseID>{{ DatabaseID }}</DatabaseID>
+          <ObjectType>Database</ObjectType>
         </RestrictionList>
       </Restrictions>
       <Properties><PropertyList/></Properties>
