@@ -9,6 +9,12 @@
       <v-toolbar-title>eMondrian schema editor</v-toolbar-title>
       <v-spacer />
       <v-btn
+        class="mx-2"
+        @click="catalogViewerOpened = true"
+      >
+        Open DataSource Viewer (Demo mode)
+      </v-btn>
+      <v-btn
         @click="createNewSchema"
         class="mx-2"
       >
@@ -21,12 +27,23 @@
         Open
       </v-btn>
       <v-btn
-        v-if="xmlDoc"
+        v-show="xmlDoc"
         class="mx-2"
         @click="saveSchema"
       >
         Save
       </v-btn>
+      <!-- <v-menu activator="#save-menu-activator">
+        id="save-menu-activator"
+        <v-list>
+          <v-list-item>
+            <v-list-item-title>Save</v-list-item-title>
+          </v-list-item>
+          <v-list-item>
+            <v-list-item-title>Save as</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </v-menu> -->
       <v-btn
         v-if="xmlDoc"
         class="mx-2"
@@ -104,6 +121,10 @@
         @close="closeDeleteConfimation"
         @confirm="removeElement"
       />
+      <CatalogViewerModal
+        :opened="catalogViewerOpened"
+        @close="catalogViewerOpened = false"
+      />
     </v-main>
   </v-app>
 </template>
@@ -123,6 +144,7 @@ import SchemaValidationModal from './components/Modals/SchemaValidationModal.vue
 import ErrorModal from './components/Modals/ErrorModal.vue'
 import SuccessModal from './components/Modals/SuccessModal.vue'
 import DeleteConfirmationModal from './components/Modals/DeleteConfirmationModal.vue'
+import CatalogViewerModal from './components/Modals/CatalogViewerModal.vue'
 import { createXPathFromElement } from './utils/xPath'
 
 export default {
@@ -140,6 +162,7 @@ export default {
     ErrorModal,
     SuccessModal,
     DeleteConfirmationModal,
+    CatalogViewerModal,
   },
 
   mixins: [
@@ -180,6 +203,8 @@ export default {
     successMessage: '',
     // Delete functionality
     deleteElementDialogOpened: false,
+    // Catalog viewer
+    catalogViewerOpened: false,
   }),
 
   mounted() {
@@ -350,6 +375,8 @@ export default {
       }
     },
     // Save schema functionality
+    async saveToSamePlace() {
+    },
     async saveSchema() {
       this.saveSchemaDialog = true
     },

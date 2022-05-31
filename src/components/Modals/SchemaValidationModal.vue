@@ -68,12 +68,24 @@
         </v-row>
       </v-container>
     </v-card>
+    <SuccessModal
+      message="Validation successfull"
+      :opened="successDialogOpened"
+      @close="successDialogOpened = false"
+    />
+    <ErrorModal
+      message="Errors were found during validation"
+      :opened="errorDialogOpened"
+      @close="errorDialogOpened = false"
+    />
   </v-dialog>
 </template>
 
 <script>
 import xmlDescriptionMixin from '../../mixins/xmlDescriptionMixin'
 import { validateAttibutes, validateObjects } from '../../utils/validationService'
+import SuccessModal from '../Modals/SuccessModal.vue'
+import ErrorModal from '../Modals/ErrorModal.vue'
 
 export default {
   props: {
@@ -87,8 +99,14 @@ export default {
   ],
   data() {
     return {
-      errorList: null
+      errorList: null,
+      successDialogOpened: false,
+      errorDialogOpened: false,
     }
+  },
+  components: {
+    SuccessModal,
+    ErrorModal
   },
   methods: {
     validate() {
@@ -108,6 +126,8 @@ export default {
       });
       console.log(errorList)
 
+      if (errorList.length === 0) this.successDialogOpened = true
+      else this.errorDialogOpened = true
       this.errorList = errorList
 
       const invalidElementsSet = new Set(this.errorList.map(e => e.element));

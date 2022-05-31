@@ -2477,10 +2477,10 @@ Revision is $Id$
         <Attribute name="dimension" required="true">
             <Doc></Doc>
         </Attribute>
-        <Attribute name="hierarchy" required="false">
+        <Attribute name="hierarchy" required="true">
             <Doc></Doc>
         </Attribute>
-        <Attribute name="level" required="false">
+        <Attribute name="level" required="true">
             <Doc></Doc>
         </Attribute>
     </Element>
@@ -2493,7 +2493,7 @@ Revision is $Id$
         </Attribute>
     </Element>
 
-    <Element type="Action">
+    <Element type="Action" abstract="true">
         <Doc>
             Definition of a cube action.
         </Doc>
@@ -2520,9 +2520,9 @@ Revision is $Id$
     <Element type="DrillThroughAction" class="Action">
         <Doc>
         </Doc>
-        <Attribute name="default" required="false">
+        <Attribute name="default" required="false" type="Boolean">
             <Doc>
-                Is this action default DrillThrough action.
+                Set true if this action is the default DrillThrough action.
             </Doc>
         </Attribute>
         <Array name="columns" type="DrillThroughColumn"><Doc></Doc></Array>
