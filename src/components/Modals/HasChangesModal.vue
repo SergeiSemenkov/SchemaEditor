@@ -35,11 +35,15 @@
 
 <script>
 export default {
-  props: {
-    opened: {
-      type: Boolean,
-      default: false,
+  data() {
+    return {
+      opened: true
     }
+  },
+  methods: {
+    close() {
+      this.opened = false
+    },
   }
 }
 </script>

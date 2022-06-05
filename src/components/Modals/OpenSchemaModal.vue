@@ -48,7 +48,7 @@
         <v-spacer></v-spacer>
         <v-btn
           text
-          @click="close"
+          @click="$emit('close')"
         >
           Cancel
         </v-btn>
@@ -72,12 +72,7 @@ export default {
       serverAddress: process.env.NODE_ENV === "production" ? "../xmla" : 'https://ssemenkoff.dev/emondrian/xmla',
       schemaFile: null,
       tab: null,
-    }
-  },
-  props: {
-    opened: {
-      type: Boolean,
-      default: false,
+      opened: true,
     }
   },
   computed: {
@@ -87,18 +82,13 @@ export default {
   },
   methods: {
     close() {
-      this.$emit('close')
-      this.serverAddress = process.env.NODE_ENV === "production" ? "../xmla" : 'https://ssemenkoff.dev/emondrian/xmla',
-      this.schemaFile = null
-      this.tab = null
+      this.opened = false
     },
     openSchema() {
       if (this.tab === 'server') {
         this.$emit('openFromServer', this.serverAddress)
-        this.close()
       } else if (this.tab === 'local') {
         this.$emit('openFromLocal', this.schemaFile)
-        this.close()
       }
     }
   }

@@ -28,15 +28,21 @@
 
 <script>
 export default {
+  data() {
+    return {
+      opened: true,
+    }
+  },
   props: {
     message: {
       type: String,
-      default: 'Schema was successfully savedd'
+      default: 'Something went wrong'
     },
-    opened: {
-      type: Boolean,
-      default: false,
-    }
+  },
+  methods: {
+    close() {
+      this.opened = false
+    },
   }
 }
 </script>

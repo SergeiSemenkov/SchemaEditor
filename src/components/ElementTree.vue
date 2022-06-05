@@ -38,6 +38,15 @@ export default {
       this.timestamp
       return this.xmlDoc?.querySelector("Schema")
     },
+    openedElement() {
+      return this.$store.getters['SchemaEditor/openedElement']
+    },
+  },
+  watch: {
+    async openedElement(newVal) {
+      await this.$nextTick()
+      this.updateEditorState(newVal)
+    }
   },
   methods: {
     openEditor(payload) {
@@ -62,7 +71,3 @@ export default {
   }
 }
 </script>
-
-<style>
-
-</style>

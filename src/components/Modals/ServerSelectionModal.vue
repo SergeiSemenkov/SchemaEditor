@@ -1,31 +1,35 @@
 <template>
   <v-dialog
     v-model="opened"
-    width="500"
     persistent
   >
     <v-card>
       <v-card-title class="text-h5 grey lighten-2">
-        Remove element
+        Select server address
       </v-card-title>
-       <v-card-text class="pa-4">
-        Are you sure you want to remove the element?
+      <v-card-text class="pa-4">
+        <v-text-field
+          class="mx-4"
+          v-model="serverAddress"
+          label="XMLA server address"
+        ></v-text-field>
+        <v-divider></v-divider>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn
-          color="primary"
           text
           @click="$emit('close')"
         >
           Cancel
         </v-btn>
         <v-btn
-          color="error"
           text
-          @click="$emit('confirm')"
+          color="primary"
+          :disabled="!serverAddress"
+          @click="$emit('saveToServer', serverAddress)"
         >
-          Remove
+          Continue
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -36,13 +40,14 @@
 export default {
   data() {
     return {
+      serverAddress: process.env.NODE_ENV === "production" ? "../xmla" : 'https://ssemenkoff.dev/emondrian/xmla',
       opened: true,
     }
   },
   methods: {
     close() {
       this.opened = false
-    },
+    }
   }
 }
 </script>

@@ -10,7 +10,6 @@
       <v-spacer />
       <v-col cols=1>
          <v-tooltip
-            v-if="canPaste"
             bottom
           >
             <template v-slot:activator="{ on, attrs }">
@@ -118,10 +117,6 @@ export default {
     },
   },
   computed: {
-    canPaste() {
-      if (!this.$root.$children[0].bufferElement) return false
-      return this.possibleElements.find(e => e === this.$root.$children[0].bufferElement.tagName)
-    },
     arrayItems() {
       this.timestamp
       
@@ -151,23 +146,33 @@ export default {
         this.addNewItem();
       }
     },
-    pasteItem() {
-      const createdElement = this.$root.$children[0].bufferElement.cloneNode(true)
+    async pasteItem() {
+      const serializedItem = await navigator.clipboard.readText();
+      const parser = new DOMParser()
+      const item = parser.parseFromString(serializedItem, "text/xml")
+      const elementToPaste = item.documentElement
+      const possibleToPaste = this.possibleElements.find(e => e === elementToPaste.tagName)
+      console.log(possibleToPaste)
+      if (!possibleToPaste) {
+        this.$errorModal.open(`<b class="text-h6">Item from your clipboard can't be pasted here</b>`)
+        return
+      }
+
       const desc = this.getDescriptionForElement(this.element.tagName)
 
       if (this.arrayItems.length) {
-        this.arrayItems[this.arrayItems.length - 1].insertAdjacentElement('afterend', createdElement)
+        this.arrayItems[this.arrayItems.length - 1].insertAdjacentElement('afterend', elementToPaste)
 
-        const itemIndex = Array.from(createdElement.parentNode.children).indexOf(createdElement)
-        const prevItem = createdElement.parentNode.children[itemIndex - 1]
-        const prevItemNodeIndex = Array.from(createdElement.parentNode.childNodes).indexOf(prevItem)
-        const prevItemSeparator = createdElement.parentNode.childNodes[prevItemNodeIndex - 1]
+        const itemIndex = Array.from(elementToPaste.parentNode.children).indexOf(elementToPaste)
+        const prevItem = elementToPaste.parentNode.children[itemIndex - 1]
+        const prevItemNodeIndex = Array.from(elementToPaste.parentNode.childNodes).indexOf(prevItem)
+        const prevItemSeparator = elementToPaste.parentNode.childNodes[prevItemNodeIndex - 1]
         let newtext = '\n'
         if (prevItemSeparator.nodeType === 3) {
           newtext = prevItemSeparator.textContent
         }
 
-        createdElement.insertAdjacentHTML('beforebegin', newtext)
+        elementToPaste.insertAdjacentHTML('beforebegin', newtext)
       } else {
         const arraysBefore = desc.arrays.filter(e => e.index < this.arrayDescription.index)
         let itemInserted = false
@@ -176,24 +181,24 @@ export default {
           const possibleElements = this.getElementsOfType(tmpArray.type)
           const items = Array.from(this.element.querySelectorAll(`:scope > ${possibleElements.join(', :scope >')}`))
           if (items.length) {
-            items[items.length - 1].insertAdjacentElement('afterend', createdElement)
+            items[items.length - 1].insertAdjacentElement('afterend', elementToPaste)
             itemInserted = true
 
-            const itemIndex = Array.from(createdElement.parentNode.children).indexOf(createdElement)
-            const prevItem = createdElement.parentNode.children[itemIndex - 1]
-            const prevItemNodeIndex = Array.from(createdElement.parentNode.childNodes).indexOf(prevItem)
-            const prevItemSeparator = createdElement.parentNode.childNodes[prevItemNodeIndex - 1]
+            const itemIndex = Array.from(elementToPaste.parentNode.children).indexOf(elementToPaste)
+            const prevItem = elementToPaste.parentNode.children[itemIndex - 1]
+            const prevItemNodeIndex = Array.from(elementToPaste.parentNode.childNodes).indexOf(prevItem)
+            const prevItemSeparator = elementToPaste.parentNode.childNodes[prevItemNodeIndex - 1]
             let newtext = '\n'
             if (prevItemSeparator.nodeType === 3) {
               newtext = prevItemSeparator.textContent
             }
 
-            createdElement.insertAdjacentHTML('beforebegin', newtext)
+            elementToPaste.insertAdjacentHTML('beforebegin', newtext)
           }
           break
         }
         if (!itemInserted) {
-          this.element.insertAdjacentElement('afterbegin', createdElement)
+          this.element.insertAdjacentElement('afterbegin', elementToPaste)
 
           const elIndex = Array.from(this.element.parentNode.childNodes).indexOf(this.element)
           const elSeparator = this.element.parentNode.childNodes[elIndex - 1]
@@ -204,12 +209,13 @@ export default {
             newtext = newtext.replace(/\n+/, '\n')
           }
 
-          createdElement.insertAdjacentHTML('beforebegin', newtext)
-          createdElement.insertAdjacentHTML('afterend', newtext)
+          elementToPaste.insertAdjacentHTML('beforebegin', newtext)
+          elementToPaste.insertAdjacentHTML('afterend', newtext)
         }
       }
-      this.$root.$emit('modelChanged')
-      this.$emit('open-editor', { element: createdElement })
+      
+      this.$store.dispatch('SchemaEditor/updateModel')
+      this.$emit('open-editor', { element: elementToPaste })
     },
     addNewItem() {
       if (this.newItemType) {
@@ -296,7 +302,7 @@ export default {
           }
         }
 
-        this.$root.$emit('modelChanged')
+        this.$store.dispatch('SchemaEditor/updateModel')
 
         this.$emit('open-editor', { element: createdElement })
       }

@@ -188,9 +188,6 @@ export default {
     }
   },
   methods: {
-    update() {
-      this.$emit('update')
-    },
     openItem() {
       this.$emit('open-editor',  { element: this.obj.element })
     },
@@ -257,7 +254,7 @@ export default {
         el.insertAdjacentHTML('afterend', newtext)
       }
       
-      this.$root.$emit('modelChanged')
+      this.$store.dispatch('SchemaEditor/updateModel')
     },
     addNewItem() {
       if (this.newItemType) {

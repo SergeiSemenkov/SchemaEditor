@@ -164,7 +164,7 @@ export default {
       return 'mdi-xml';
     },
     hasErrors() {
-      const elementsWithErrors = this.$root.$children[0].invalidElementSet
+      const elementsWithErrors = this.$store.getters['SchemaEditor/invalidElements']
       if (elementsWithErrors.has(this.element)) {
         return 'element_has_errors element_has_errors_in_child'
       }
@@ -180,16 +180,15 @@ export default {
     }
   },
   methods: {
-    update() {
-      this.$emit('update')
-    },
     copyItem() {
-      this.$root.$children[0].bufferElement = this.element
+      const serializer = new XMLSerializer();
+      const serializedItem = serializer.serializeToString(this.element);
+      navigator.clipboard.writeText(serializedItem);
     },
     duplicateItem() {
       const createdElement = this.element.cloneNode(true)
       this.element.insertAdjacentElement('afterend', createdElement)
-      this.$root.$emit('modelChanged')
+      this.$store.dispatch('SchemaEditor/updateModel')
     },
     openItem() {
       this.$emit('open-editor',  { element: this.element })
@@ -213,7 +212,6 @@ export default {
         }
         return false;
       });
-      console.log(this.desc.objects, obj);
       const objectsBefore = this.desc.objects.filter((e) => e.index < currentObjDesc.index)
       let itemInserted = false
       if (objectsBefore.length) {
@@ -259,13 +257,13 @@ export default {
         el.insertAdjacentHTML('afterend', newtext)
       }
       
-      this.$root.$emit('modelChanged')
+      this.$store.dispatch('SchemaEditor/updateModel')
     },
     getObjectKey(item, idx) {
       return `${item?.element?.tagName || item.type}-${item.name}-${idx}`
     },
     getObjectClasses(obj) {
-      const elementsWithErrors = this.$root.$children[0].invalidElementSet
+      const elementsWithErrors = this.$store.getters['SchemaEditor/invalidElements']
       if (elementsWithErrors.has(this.element)) {
         if (obj.required && !obj.element) {
           return 'object_has_errors'
@@ -274,8 +272,17 @@ export default {
 
       return ''
     },
-    deleteItem() {
-      this.$root.$emit('removeItem', this.element)
+    async deleteItem() {
+      const { confirmed } = await this.$deleteConfirmationModal.open()
+
+      if (!confirmed) return;
+
+      this.element.parentNode.removeChild(this.element)
+      this.$store.dispatch('SchemaEditor/updateModel')
+
+      if (this.element === this.$store.getters['SchemaEditor/openedElement']) {
+        this.$store.dispatch('SchemaEditor/closeEditor');
+      }
     }
   }
 }

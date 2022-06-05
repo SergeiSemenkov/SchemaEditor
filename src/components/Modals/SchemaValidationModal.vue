@@ -3,6 +3,7 @@
     v-model="opened"
     fullscreen
     hide-overlay
+    :retain-focus="false"
     transition="dialog-bottom-transition"
   >
     <v-card>
@@ -13,7 +14,7 @@
         <v-btn
           icon
           dark
-          @click="$emit('close')"
+          @click="closeValidation"
         >
           <v-icon>mdi-close</v-icon>
         </v-btn>
@@ -55,7 +56,7 @@
                     <td>
                       <v-btn
                         text
-                        @click="navigateToElement(error)"
+                        @click="closeValidation(error)"
                       >
                         Open element
                       </v-btn>
@@ -68,50 +69,39 @@
         </v-row>
       </v-container>
     </v-card>
-    <SuccessModal
-      message="Validation successfull"
-      :opened="successDialogOpened"
-      @close="successDialogOpened = false"
-    />
-    <ErrorModal
-      message="Errors were found during validation"
-      :opened="errorDialogOpened"
-      @close="errorDialogOpened = false"
-    />
   </v-dialog>
 </template>
 
 <script>
 import xmlDescriptionMixin from '../../mixins/xmlDescriptionMixin'
 import { validateAttibutes, validateObjects } from '../../utils/validationService'
-import SuccessModal from '../Modals/SuccessModal.vue'
-import ErrorModal from '../Modals/ErrorModal.vue'
 
 export default {
-  props: {
-    opened: {
-      type: Boolean,
-      default: false,
-    }
-  },
   mixins: [
     xmlDescriptionMixin
   ],
   data() {
     return {
-      errorList: null,
+      opened: true,
+      errorList: this.errorListProvided,
       successDialogOpened: false,
       errorDialogOpened: false,
     }
   },
-  components: {
-    SuccessModal,
-    ErrorModal
+  props: {
+    xmlDoc: {
+      type: XMLDocument,
+      required: true,
+    },
+    errorListProvided: {
+      type: Array,
+      default: () => [],
+    }
   },
   methods: {
     validate() {
       let errorList = []
-      const schema = this.$root.$children[0].xmlDoc
+      const schema = this.xmlDoc
 
       const elements = schema.querySelectorAll('*')
 
@@ -124,14 +114,10 @@ export default {
           ...validateObjects(element, desc, this.getElementsOfType)
         ]
       });
-      console.log(errorList)
 
-      if (errorList.length === 0) this.successDialogOpened = true
-      else this.errorDialogOpened = true
+      if (errorList.length === 0) this.$successModal.open(`<b class="text-h6">Validation successfull</b>`)
+      else this.$errorModal.open('<b class="text-h6">Errors were found during validation</b>')
       this.errorList = errorList
-
-      const invalidElementsSet = new Set(this.errorList.map(e => e.element));
-      this.$emit('highlight-invalid-items', invalidElementsSet)
     },
     getElementName(element) {
       const name = element.getAttribute('name')
@@ -141,11 +127,13 @@ export default {
         return `${element.tagName} (name not specified)`
       }
     },
-    navigateToElement(error) {
+    closeValidation(error) {
       const { element, attribute } = error
-      this.$emit('close')
-      this.$emit('open-editor', { element: element, attribute })
-    }
+      this.$emit('close', { errorList: this.errorList, element, attribute})
+    },
+    close() {
+      this.opened = false;
+    },
   }
 }
 </script>

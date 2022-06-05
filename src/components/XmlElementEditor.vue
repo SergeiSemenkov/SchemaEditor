@@ -17,7 +17,7 @@
               </v-col>
               <v-spacer />
               <v-col cols=3 v-if="elementType === 'Cube' || elementType === 'VirtualCube'">
-                <v-btn block @click="diagramWindow = true">Open diagram</v-btn>
+                <v-btn block @click="openDiagram">Open diagram</v-btn>
               </v-col>
             </v-row>
             <v-row>
@@ -129,11 +129,6 @@
         </v-col>
       </v-row>
     </v-col>
-    <DiagramModal
-      :opened="diagramWindow"
-      :cube="element"
-      @close="diagramWindow = false"
-    />
     <SourceTableSelectionModal 
       :opened="sourceTableDialogOpened"
       :selected-attribute-value="attributeForSourceTableSelection ? configuredElement[attributeForSourceTableSelection.name] : ''"
@@ -163,6 +158,10 @@ export default {
     element: {
       type: Element,
       required: true
+    },
+    xmlDoc: {
+      type: XMLDocument,
+      required: true
     }
   },
   components: {
@@ -172,7 +171,17 @@ export default {
     OptionalBooleanEditor,
   },
   mounted() {
-    this.$refs.form.validate();
+    this.$refs.form.validate()
+    if (this.focusedAttribute) {
+      this.focusOnAttribute(this.focusedAttribute)
+    }
+  },
+  watch: {
+    focusedAttribute(newVal) {
+      if (newVal) {
+        this.focusOnAttribute(newVal)
+      }
+    }
   },
   data() {
     const desc = this.getDescriptionForElement(this.element.tagName)  
@@ -197,8 +206,6 @@ export default {
           // value => (value && value.length >= 3) || 'Min 3 characters',
         ],
       },
-      // Schema diagram
-      diagramWindow: false,
       sourceTableDialogOpened: false,
       attributeForSourceTableSelection: null,
     }
@@ -225,17 +232,13 @@ export default {
       return this.element.tagName
     },
     serverAvailable() {
-      return this.$root.$children[0].editMode === 'server'
-    }
+      return this.$store.getters['SchemaEditor/serverUrl']
+    },
+    focusedAttribute() {
+      return this.$store.getters['SchemaEditor/openedElementFocusedAttribute']
+    },
   },
   methods: {
-    // sortAttributes() {
-    //   const reqAttrsStorage = this.requiredAttributes.map()
-    //   const optAttrsStorage = this.optionalAttributes.map()
-
-
-    //   this.a
-    // },
     updateXmlAttribute(attributeName, attributeValue) {
       const attr = this.elementDesc.attributes.find(e => e.name === attributeName)
       if (attr.type === 'Boolean' && attributeValue === 'none') {
@@ -244,14 +247,14 @@ export default {
         this.element.setAttribute(attributeName, attributeValue === null ? '' : attributeValue)
       }
 
-      this.$root.$emit('modelChanged')
+      this.$store.dispatch('SchemaEditor/updateModel')
       this.$emit('open-editor',  { element: this.element })
     },
     updateXmlValue(value) {
       const wrappedValue = `\n<![CDATA[ \n ${value} \n ]]>\n`
       this.element.innerHTML = wrappedValue
 
-      this.$root.$emit('modelChanged')
+      this.$store.dispatch('SchemaEditor/updateModel')
       this.$emit('open-editor',  { element: this.element })
     },
     expandTextArea() {
@@ -285,7 +288,7 @@ export default {
         return attr.values
       }
       if (attr.references) {
-        const doc = this.$root.$children[0].xmlDoc
+        const doc = this.xmlDoc
         const refs = attr.references
         let xPathResult = []
         refs.forEach(r => {
@@ -309,7 +312,7 @@ export default {
       this.configuredElement[attributeName] = attributeValue
       this.element.setAttribute(attributeName, attributeValue === null ? '' : attributeValue)
       
-      this.$root.$emit('modelChanged')
+      this.$store.dispatch('SchemaEditor/updateModel')
       this.$emit('open-editor', { element: this.element })
     },
     onTableManuallyChanged(attribute, table) {
@@ -319,12 +322,15 @@ export default {
       this.configuredElement[attributeName] = attributeValue
       this.element.setAttribute(attributeName, attributeValue === null ? '' : attributeValue)
       
-      this.$root.$emit('modelChanged')
+      this.$store.dispatch('SchemaEditor/updateModel')
       this.$emit('open-editor', { element: this.element })
     },
     openSourceTableSelection(attr) {
       this.attributeForSourceTableSelection = attr
       this.sourceTableDialogOpened = true
+    },
+    openDiagram() {
+      this.$diagramModal.open(this.element)
     }
   }
 }

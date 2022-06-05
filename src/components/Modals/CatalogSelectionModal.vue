@@ -57,29 +57,22 @@ import { fetchCatalogList } from '../../services/XmlaApi'
 
 export default {
   props: {
-    opened: {
-      type: Boolean,
-      default: false,
-    },
     serverAddress: {
       type: String,
       default: '',
     }
   },
-  watch: {
-    async opened(newVal) {
-      if (newVal) {
-        this.isLoading = true
-        this.catalogs = await this.fetchCatalogs(this.serverAddress)
-        this.isLoading = false
-      }
-    }
+  async mounted() {
+    this.isLoading = true
+    this.catalogs = await this.fetchCatalogs(this.serverAddress)
+    this.isLoading = false
   },
   data() {
     return {
       catalogs: [],
       selectedCatalog: null,
       isLoading: false,
+      opened: true,
     }
   },
   methods: {
@@ -105,9 +98,9 @@ export default {
       } catch (e) {
         this.$emit('cancel')
         if (e.message) {
-          this.$root.$emit('errorMessage', e.message)
+          this.$errorModal.$open(e.message)
         } else {
-          this.$root.$emit('errorMessage', '<b class="text-h6">Unable to load catalog list from the provided server</b>')
+          this.$errorModal.$open('<b class="text-h6">Unable to load catalog list from the provided server</b>')
         }
       }
     },
@@ -118,11 +111,10 @@ export default {
     selectCatalog() {
       this.$emit('selectCatalog', this.selectedCatalog)
       this.selectedCatalog = null
-    }
+    },
+    close() {
+      this.opened = false
+    },
   }
 }
 </script>
-
-<style>
-
-</style>

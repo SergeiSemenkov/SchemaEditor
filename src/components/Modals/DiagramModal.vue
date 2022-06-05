@@ -75,10 +75,6 @@ export default {
     VueDiagramEditor
   },
   props: {
-    opened: {
-      type: Boolean,
-      default: false,
-    },
     cube: {
       type: Element,
       required: true,
@@ -89,6 +85,7 @@ export default {
   ],
   data: () => ({
     showDiagram: false,
+    opened: true,
     nodes: {
     },
     links: {
@@ -96,16 +93,12 @@ export default {
     colors,
     colorsDescriptions: Object.entries(colors),
   }),
-  watch: {
-    async opened(newVal) {
-      if (newVal) {
-        this.parseSchema();
-        await this.$nextTick();
-        this.showDiagram = true;
-        await this.$nextTick();
-        this.init();
-      }
-    }
+  async mounted() {
+    this.parseSchema();
+    await this.$nextTick();
+    this.showDiagram = true;
+    await this.$nextTick();
+    this.init();
   },
   methods: {
     parseSchema() {
@@ -264,7 +257,6 @@ export default {
     },
     nodeColor(node) {
       const nodeType = node.data.tagName
-      console.log(nodeType);
       switch (nodeType) {
         case 'Dimension':
           return colors['Dimension'];
@@ -284,6 +276,9 @@ export default {
       const possibleElements = this.getElementsOfType("Hierarchy").filter(e => !e.abstract)
       const hierarchies = Array.from(e.querySelectorAll(`:scope > ${possibleElements.join(', :scope >')}`))
       return hierarchies
+    },
+    close() {
+      this.opened = false
     }
   }
 }
