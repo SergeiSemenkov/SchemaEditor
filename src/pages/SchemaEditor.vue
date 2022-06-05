@@ -111,8 +111,8 @@ export default {
   }),
 
   mounted() {
-    console.log('Server for demo purposes:')
-    console.log('https://ssemenkoff.dev/emondrian/xmla')
+    console.warn('Server for demo purposes:')
+    console.warn('https://ssemenkoff.dev/emondrian/xmla')
 
     this.$root.$on('errorMessage', (e) => {
       this.$errorModal.open(e)

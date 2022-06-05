@@ -152,7 +152,6 @@ export default {
       const item = parser.parseFromString(serializedItem, "text/xml")
       const elementToPaste = item.documentElement
       const possibleToPaste = this.possibleElements.find(e => e === elementToPaste.tagName)
-      console.log(possibleToPaste)
       if (!possibleToPaste) {
         this.$errorModal.open(`<b class="text-h6">Item from your clipboard can't be pasted here</b>`)
         return
