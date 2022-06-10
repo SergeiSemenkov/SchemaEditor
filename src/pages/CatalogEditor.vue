@@ -59,11 +59,6 @@
         </v-row>
       </v-container>
     </v-main>
-    <SuccessModal
-      :message="successMessage"
-      :opened="successDialogOpened"
-      @close="successDialogOpened = false"
-    />
   </v-app>
 </template>
 
@@ -72,7 +67,6 @@ import { fetchDatabasesList, saveDatabase } from '../services/XmlaApi'
 import CatalogsTree from '../components/CatalogViewier/CatalogsTree.vue'
 import CatalogsEditor from '../components/CatalogViewier/CatalogsEditor.vue'
 import DataSourceEditor from '../components/CatalogViewier/DataSourceEditor.vue'
-import SuccessModal from '../components/Modals/SuccessModal.vue'
 
 export default {
   props: {
@@ -85,7 +79,6 @@ export default {
     CatalogsTree,
     CatalogsEditor,
     DataSourceEditor,
-    SuccessModal,
   },
   data() {
     return {
@@ -94,8 +87,6 @@ export default {
       openedItem: null,
       openedItemKey: null,
       serverUrl: 'https://ssemenkoff.dev/emondrian/xmla',
-      successDialogOpened: false,
-      successMessage: '',
     };
   },
   async mounted() {
@@ -115,9 +106,9 @@ export default {
       this.xmlDoc = parser.parseFromString(databasesSchema.wholeText, "text/xml")
     } catch (e) {
       if (e.message) {
-        this.$root.$emit('errorMessage', e.message)
+        this.$errorModal.open(e.message)
       } else {
-        this.$root.$emit('errorMessage', '<b class="text-h6">Unable to load schema from the provided server</b>')
+        this.$errorModal.open('<b class="text-h6">Unable to load schema from the provided server</b>')
       }
     }
   },
@@ -141,7 +132,7 @@ export default {
     async saveDatasources() {
       const validationResult = this.validateDatabaseXml(this.xmlDoc);
       if (!validationResult) {
-        this.$root.$emit('errorMessage', 'Could not save DataSource. Configured data is not valid.');
+        this.$errorModal.open('<b class="text-h6">Could not save DataSource. Configured data is not valid.</b>')
         return;
       }
 
@@ -170,16 +161,15 @@ export default {
 
         const successResponce = saveResponce.querySelector('ExecuteResponse')
         if (successResponce) {
-          this.successMessage = `<b class="text-h6">Database was succesfully saved</b>`
-          this.successDialogOpened = true
+          this.$successModal.open(`<b class="text-h6">Database was succesfully saved</b>`)
         } else {
           throw new Error('<b class="text-h6">Something went wrong while saving database to the server</b>')
         }
       } catch (e) {
         if (e.message) {
-          this.$root.$emit('errorMessage', e.message)
+          this.$errorModal.open(e.message)
         } else {
-          this.$root.$emit('errorMessage', '<b class="text-h6">Unable to save database to the provided server</b>')
+          this.$errorModal.open('<b class="text-h6">Unable to save database to the provided server</b>')
         }
       }
     },
