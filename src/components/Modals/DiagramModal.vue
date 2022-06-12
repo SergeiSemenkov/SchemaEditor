@@ -3,7 +3,6 @@
     v-model="opened"
     persistent
     fullscreen
-    width="500"
   >
     <v-card>
       <v-toolbar
@@ -32,7 +31,7 @@
           <template v-if="node.id !== 'cube'">
             <svg style="position: absolute; left: 10%; width: 80%; top: 0">
               <template v-for="(hier, i) in  getHierarchyList(node.data)">
-                <rect width=10000 height="30" :y="10 + i * 35" :fill="colors['Hierarchy']" :key="`${hier.getAttribute('name')}_rect`">
+                <rect :key="`${hier.getAttribute('name')}_rect`" width=10000 height="30" :y="10 + i * 35" :fill="colors['Hierarchy']" >
                 </rect>
                 <text x=5 :y="20 + i * 35" font-size="7" :key="`${hier.getAttribute('name')}_label`" fill="#fff">
                   Hierarchy {{  hier.getAttribute('name') || 'with no name' }}

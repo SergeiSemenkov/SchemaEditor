@@ -19,6 +19,9 @@
               <v-col cols=3 v-if="elementType === 'Cube' || elementType === 'VirtualCube'">
                 <v-btn block @click="openDiagram">Open diagram</v-btn>
               </v-col>
+              <v-col cols=3>
+                <v-btn block @click="openXmlContent">Open XML Content</v-btn>
+              </v-col>
             </v-row>
             <v-row>
               <v-col cols=6>
@@ -331,7 +334,32 @@ export default {
     },
     openDiagram() {
       this.$diagramModal.open(this.element)
+    },
+    openXmlContent() {
+      this.$xmlViewerModal.open(this.element, async (newElement) => {
+        try {
+          const parser = new DOMParser()
+          const updatedElement = parser.parseFromString(newElement, "text/xml").documentElement
+          console.log(updatedElement)
+          const errors = updatedElement.querySelectorAll('parsererror')
+          if (errors.length) throw new Error(errors[0].querySelector('div').innerHTML)
+
+          if (updatedElement.tagName !== this.element.tagName) throw new Error(`Type of Element from modified XML doesn't match original element`)
+          this.element.parentNode.replaceChild(updatedElement, this.element);
+          this.$store.dispatch('SchemaEditor/updateModel')
+          this.$store.dispatch('SchemaEditor/closeEditor')
+          await this.$nextTick()
+          this.$store.dispatch('SchemaEditor/openEditor', { element: updatedElement })
+          this.$successModal.open(`<b class="text-h6">Schema was succesfully saved</b>`)
+        } catch (e) {
+          if (e.message) {
+            this.$errorModal.open(`<b class="text-h6">Unable to save xml element: </b><br/><p>'${e.message}'</p>`)
+          } else {
+            this.$errorModal.open(`<b class="text-h6">Unable to save xml element.</b>`)
+          }
+        }
+      });
     }
-  }
 }
+  }
 </script>
