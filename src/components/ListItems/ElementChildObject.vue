@@ -254,7 +254,7 @@ export default {
         el.insertAdjacentHTML('afterend', newtext)
       }
       
-      this.$store.dispatch('SchemaEditor/updateModel')
+      this.$store.dispatch('SchemaEditor/updateModel', { element: this.element, action: 'create' })
     },
     addNewItem() {
       if (this.newItemType) {

@@ -247,14 +247,14 @@ export default {
         this.element.setAttribute(attributeName, attributeValue === null ? '' : attributeValue)
       }
 
-      this.$store.dispatch('SchemaEditor/updateModel')
+      this.$store.dispatch('SchemaEditor/updateModel', { element: this.element, action: 'editItem' })
       this.$emit('open-editor',  { element: this.element })
     },
     updateXmlValue(value) {
       const wrappedValue = `\n<![CDATA[ \n ${value} \n ]]>\n`
       this.element.innerHTML = wrappedValue
 
-      this.$store.dispatch('SchemaEditor/updateModel')
+      this.$store.dispatch('SchemaEditor/updateModel', { element: this.element, action: 'editItem' })
       this.$emit('open-editor',  { element: this.element })
     },
     expandTextArea() {
@@ -312,7 +312,7 @@ export default {
       this.configuredElement[attributeName] = attributeValue
       this.element.setAttribute(attributeName, attributeValue === null ? '' : attributeValue)
       
-      this.$store.dispatch('SchemaEditor/updateModel')
+      this.$store.dispatch('SchemaEditor/updateModel', { element: this.element, action: 'editItem' })
       this.$emit('open-editor', { element: this.element })
     },
     onTableManuallyChanged(attribute, table) {
@@ -322,7 +322,7 @@ export default {
       this.configuredElement[attributeName] = attributeValue
       this.element.setAttribute(attributeName, attributeValue === null ? '' : attributeValue)
       
-      this.$store.dispatch('SchemaEditor/updateModel')
+      this.$store.dispatch('SchemaEditor/updateModel', { element: this.element, action: 'editItem' })
       this.$emit('open-editor', { element: this.element })
     },
     openSourceTableSelection(attr) {

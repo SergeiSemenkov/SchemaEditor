@@ -10,6 +10,38 @@
       <v-list-item-content>
         <v-list-item-title v-text="name"></v-list-item-title>
       </v-list-item-content>
+        <v-tooltip bottom v-if="movable">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              icon
+              v-bind="attrs"
+              v-on="on"
+              :disabled="isFirst"
+              @click.stop.prevent="$emit('moveUp')"
+            >
+              <v-icon
+                v-text="'mdi-arrow-up'"
+              ></v-icon>
+            </v-btn>
+          </template>
+          <span>Move up</span>
+        </v-tooltip>
+        <v-tooltip bottom v-if="movable">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              icon
+              v-bind="attrs"
+              v-on="on"
+              :disabled="isLast"
+              @click.stop.prevent="$emit('moveDown')"
+            >
+              <v-icon
+                v-text="'mdi-arrow-down'"
+              ></v-icon>
+            </v-btn>
+          </template>
+          <span>Move down</span>
+        </v-tooltip>
         <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
             <v-btn
@@ -121,6 +153,18 @@ export default {
     timestamp: {
       type: Number,
       required: true,
+    },
+    movable: {
+      type: Boolean,
+      default: false,
+    },
+    isFirst: {
+      type: Boolean,
+      default: false,
+    },
+    isLast: {
+      type: Boolean,
+      default: false,
     }
   },
   data() {
@@ -188,7 +232,7 @@ export default {
     duplicateItem() {
       const createdElement = this.element.cloneNode(true)
       this.element.insertAdjacentElement('afterend', createdElement)
-      this.$store.dispatch('SchemaEditor/updateModel')
+      this.$store.dispatch('SchemaEditor/updateModel', { element: this.element, action: 'create' })
     },
     openItem() {
       this.$emit('open-editor',  { element: this.element })
@@ -257,7 +301,7 @@ export default {
         el.insertAdjacentHTML('afterend', newtext)
       }
       
-      this.$store.dispatch('SchemaEditor/updateModel')
+      this.$store.dispatch('SchemaEditor/updateModel', { element: this.element, action: 'create' })
     },
     getObjectKey(item, idx) {
       return `${item?.element?.tagName || item.type}-${item.name}-${idx}`
@@ -278,7 +322,7 @@ export default {
       if (!confirmed) return;
 
       this.element.parentNode.removeChild(this.element)
-      this.$store.dispatch('SchemaEditor/updateModel')
+      this.$store.dispatch('SchemaEditor/updateModel', { element: this.element, action: 'delete' })
 
       if (this.element === this.$store.getters['SchemaEditor/openedElement']) {
         this.$store.dispatch('SchemaEditor/closeEditor');

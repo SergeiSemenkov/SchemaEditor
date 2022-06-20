@@ -49,6 +49,11 @@
       :key="`${arrayDescription.type}-${getElementName(item)}-${idx}`"
       :element="item"
       :timestamp="timestamp"
+      movable
+      :isFirst="idx === 0"
+      :isLast="idx === arrayItems.length - 1"
+      @moveUp="moveUp(item, arrayItems[idx - 1])"
+      @moveDown="moveDown(item, arrayItems[idx + 1])"
       @open-editor="openChildElement"
     />
     <v-dialog
@@ -213,7 +218,7 @@ export default {
         }
       }
       
-      this.$store.dispatch('SchemaEditor/updateModel')
+      this.$store.dispatch('SchemaEditor/updateModel', { element: this.element, action: 'create' })
       this.$emit('open-editor', { element: elementToPaste })
     },
     addNewItem() {
@@ -301,11 +306,22 @@ export default {
           }
         }
 
-        this.$store.dispatch('SchemaEditor/updateModel')
+        this.$store.dispatch('SchemaEditor/updateModel', { element: this.element, action: 'create' })
 
         this.$emit('open-editor', { element: createdElement })
       }
-    }
+    },
+    moveUp(element, neighbour) {
+      console.log(element.parentNode)
+      element.parentNode.removeChild(element);
+      neighbour.insertAdjacentElement('beforebegin', element)
+      this.$store.dispatch('SchemaEditor/updateModel', { element: this.element, action: 'move' })
+    },
+    moveDown(element, neighbour) {
+      element.parentNode.removeChild(element);
+      neighbour.insertAdjacentElement('afterend', element)
+      this.$store.dispatch('SchemaEditor/updateModel', { element: this.element, action: 'move' })
+    },
   }
 }
 </script>

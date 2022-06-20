@@ -127,7 +127,6 @@ export default {
       this.openedItemKey = item.key;
     },
     updateModel() {
-      console.log('Update model')
       this.updateTimestamp = Date.now();
     },
     removeElement(element) {

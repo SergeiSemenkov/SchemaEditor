@@ -10,7 +10,11 @@ const state = () => ({
   // Editor state
   openedElement: null,
   openedElementFocusedAttribute: null,
+  modelCursor: 0,
 })
+
+let modelHistory = [];
+import { createXPathFromElement, getElementByXpath } from '../../utils/xPath'
 
 // getters
 const getters = {
@@ -43,6 +47,14 @@ const getters = {
   canSave(state) {
     return !!state.serverUrl && !!state.database
   },
+  canRedo(state) {
+    state.timestamp
+    return modelHistory.length && state.modelCursor < modelHistory.length - 1;
+  },
+  canUndo(state) {
+    state.timestamp
+    return modelHistory.length && state.modelCursor > 0;
+  },
   validationState(state) {
     return state.validationErrors
   },
@@ -67,12 +79,13 @@ const actions = {
       xmlDoc: document.implementation.createDocument(null, "Schema")
     });
   },
-  openSchema({ commit }, { xmlDoc }) {
+  openSchema({ commit, dispatch }, { xmlDoc }) {
     commit('setSchema', { xmlDoc });
 
     const serializer = new XMLSerializer
     const text = serializer.serializeToString(xmlDoc)
     commit('setLastSavedSchema', { serializedSchema: text })
+    dispatch('updateModel', { element: null, action: 'openSchema' })
   },
   setValidationState({ commit }, { errorList }) {
     commit('setValidationErrors', { errorList });
@@ -89,12 +102,70 @@ const actions = {
   closeEditor({ commit }) {
     commit('setOpenedElement', { element: null, attribute: null })
   },
-  updateModel({ commit }) {
-    commit('setTimestamp', { timestamp: Date.now() })
+  updateModel({ commit, state }, { element, action }) {
+    let xPath = null
+    if (element) {
+      xPath = createXPathFromElement(element, state.xmlDoc)
+    }
+
+    modelHistory = modelHistory.slice(0, state.modelCursor + 1);
+
+    const timestamp = Date.now();
+    const currentModelId = modelHistory[modelHistory.length - 1] ? modelHistory[modelHistory.length - 1].id : -1;
+    commit('setSchemaHistoryCursor', { position: currentModelId + 1 })
+    
+
+    const serializer = new XMLSerializer
+    const xmlDocState = serializer.serializeToString(state.xmlDoc)
+
+    modelHistory.push({
+      id: currentModelId + 1,
+      timestamp,
+      xmlDocState: xmlDocState,
+      action,
+      xPath
+    })
+
+    commit('setTimestamp', { timestamp })
   },
   setLastSavedSchema({ commit }, { serializedSchema }) {
     commit('setLastSavedSchema', { serializedSchema })
-  }
+  },
+  undo({ commit, state, dispatch }) {
+    const timestamp = Date.now();
+    const currentState = modelHistory[state.modelCursor]
+    
+    commit('setSchemaHistoryCursor', { position: state.modelCursor - 1 })
+    const id = modelHistory[state.modelCursor].id
+    
+    commit('setSchemaFromHistory', { id })
+    if (currentState.action === 'editItem') {
+      const newElement = getElementByXpath(currentState.xPath, state.xmlDoc).iterateNext();
+      dispatch('openEditor', { element: newElement })
+    } else {
+      dispatch('closeEditor')
+    }
+
+    commit('setTimestamp', { timestamp })
+  },
+  redo({ commit, state, dispatch }) {
+    const timestamp = Date.now()
+    
+    commit('setSchemaHistoryCursor', { position: state.modelCursor + 1 })
+    const id = modelHistory[state.modelCursor].id
+    
+    commit('setSchemaFromHistory', { id })
+    
+    const currentState = modelHistory[state.modelCursor]
+    if (currentState.action === 'editItem') {
+      const newElement = getElementByXpath(currentState.xPath, state.xmlDoc).iterateNext();
+      dispatch('openEditor', { element: newElement })
+    } else {
+      dispatch('closeEditor')
+    }
+
+    commit('setTimestamp', { timestamp })
+  },
 }
 
 // mutations
@@ -121,6 +192,17 @@ const mutations = {
   },
   setTimestamp(state, { timestamp}) {
     state.timestamp = timestamp
+  },
+  setSchemaFromHistory(state, { id }) {
+    const modelToRestore = modelHistory.find((entry) => entry.id === id);
+
+    const parser = new DOMParser()
+    const modelDoc = parser.parseFromString(modelToRestore.xmlDocState, "text/xml")
+
+    state.xmlDoc = modelDoc
+  },
+  setSchemaHistoryCursor(state, { position }) {
+    state.modelCursor = position
   }
 }
 

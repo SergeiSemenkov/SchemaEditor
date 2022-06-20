@@ -50,6 +50,22 @@
       >
         Validate
       </v-btn>
+      <v-btn
+        v-if="xmlDoc"
+        :disabled="!canUndo"
+        @click="undo"
+        class="mx-2"
+      >
+        Undo
+      </v-btn>
+      <v-btn
+        v-if="xmlDoc"
+        :disabled="!canRedo"
+        @click="redo"
+        class="mx-2"
+      >
+        Redo
+      </v-btn>
     </v-app-bar>
     <v-navigation-drawer
       app
@@ -71,7 +87,7 @@
         v-if="elementInEditor"
         :xmlDoc="xmlDoc"
         :element="elementInEditor"
-        :key="getElementKey(elementInEditor)"
+        :key="`${getElementKey(elementInEditor)}_${updateTimestamp}`"
         @close="elementInEditor = null"
         @open-editor="openEditor"
       />
@@ -156,6 +172,12 @@ export default {
     },
     canSave() {
       return this.$store.getters['SchemaEditor/canSave']
+    },
+    canUndo() {
+      return this.$store.getters['SchemaEditor/canUndo']
+    },
+    canRedo() {
+      return this.$store.getters['SchemaEditor/canRedo']
     }
   },
 
@@ -296,7 +318,7 @@ export default {
     // Remove item functionality
     removeElement(el) {
       el.parentNode.removeChild(el)
-      this.$store.dispatch('SchemaEditor/updateModel')
+      this.$store.dispatch('SchemaEditor/updateModel', { element: this.element, action: 'delete' })
 
       if (el === this.elementInEditor) {
         this.$store.dispatch('SchemaEditor/closeEditor');
@@ -310,6 +332,12 @@ export default {
       if (element) {
         this.$store.dispatch('SchemaEditor/openEditor', { element, attribute })
       }
+    },
+    undo() {
+      this.$store.dispatch('SchemaEditor/undo')
+    },
+    redo() {
+      this.$store.dispatch('SchemaEditor/redo')
     }
   }
 };
