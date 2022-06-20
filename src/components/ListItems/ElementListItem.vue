@@ -227,7 +227,12 @@ export default {
     copyItem() {
       const serializer = new XMLSerializer();
       const serializedItem = serializer.serializeToString(this.element);
-      navigator.clipboard.writeText(serializedItem);
+      const tmpText = document.createElement('textarea')
+      tmpText.value = serializedItem
+      document.querySelector('body').appendChild(tmpText);
+      tmpText.select();
+      document.execCommand('copy');
+      tmpText.parentNode.removeChild(tmpText);
     },
     duplicateItem() {
       const createdElement = this.element.cloneNode(true)

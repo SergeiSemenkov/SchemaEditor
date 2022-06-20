@@ -8,6 +8,8 @@ import DeleteConfirmationModal from '../components/Modals/DeleteConfirmationModa
 import ServerSelectionModal from '../components/Modals/ServerSelectionModal.vue'
 import SchemaValidationModal from '../components/Modals/SchemaValidationModal.vue'
 import DiagramModal from '../components/Modals/DiagramModal.vue'
+import { xmlViewerModal } from '../components/Modals/XmlViewerModal'
+import { pasteModal } from '../components/Modals/PasteModal'
 
 const Modals = {
   install(Vue) {
@@ -277,6 +279,9 @@ const Modals = {
         document.body.appendChild(instance.$el)
       },
     }
+
+    Vue.prototype.$xmlViewerModal = xmlViewerModal(Vue, vuetify);
+    Vue.prototype.$pasteModal = pasteModal(Vue, vuetify);
   }
 }
 

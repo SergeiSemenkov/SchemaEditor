@@ -152,9 +152,10 @@ export default {
       }
     },
     async pasteItem() {
-      const serializedItem = await navigator.clipboard.readText();
+      const { status, xml } = await this.$pasteModal.open()
+      if (status !== 'success') return;
       const parser = new DOMParser()
-      const item = parser.parseFromString(serializedItem, "text/xml")
+      const item = parser.parseFromString(xml, "text/xml")
       const elementToPaste = item.documentElement
       const possibleToPaste = this.possibleElements.find(e => e === elementToPaste.tagName)
       if (!possibleToPaste) {
