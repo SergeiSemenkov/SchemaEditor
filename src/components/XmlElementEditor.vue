@@ -337,7 +337,7 @@ export default {
     },
     openXmlContent() {
       this.$xmlViewerModal.open(this.element, async (newElement) => {
-        try {
+        // try {
           const parser = new DOMParser()
           const updatedElement = parser.parseFromString(newElement, "text/xml").documentElement
           console.log(updatedElement)
@@ -345,19 +345,20 @@ export default {
           if (errors.length) throw new Error(errors[0].querySelector('div').innerHTML)
 
           if (updatedElement.tagName !== this.element.tagName) throw new Error(`Type of Element from modified XML doesn't match original element`)
+          console.log(this.element, this.element.parentNode)
           this.element.parentNode.replaceChild(updatedElement, this.element);
-          this.$store.dispatch('SchemaEditor/updateModel')
+          this.$store.dispatch('SchemaEditor/updateModel', { element: updatedElement, action: 'edit' })
           this.$store.dispatch('SchemaEditor/closeEditor')
           await this.$nextTick()
           this.$store.dispatch('SchemaEditor/openEditor', { element: updatedElement })
           this.$successModal.open(`<b class="text-h6">Schema was succesfully saved</b>`)
-        } catch (e) {
-          if (e.message) {
-            this.$errorModal.open(`<b class="text-h6">Unable to save xml element: </b><br/><p>'${e.message}'</p>`)
-          } else {
-            this.$errorModal.open(`<b class="text-h6">Unable to save xml element.</b>`)
-          }
-        }
+        // } catch (e) {
+        //   if (e.message) {
+        //     this.$errorModal.open(`<b class="text-h6">Unable to save xml element: </b><br/><p>'${e.message}'</p>`)
+        //   } else {
+        //     this.$errorModal.open(`<b class="text-h6">Unable to save xml element.</b>`)
+        //   }
+        // }
       });
     }
 }
