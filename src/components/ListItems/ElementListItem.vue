@@ -10,86 +10,84 @@
       <v-list-item-content>
         <v-list-item-title v-text="name"></v-list-item-title>
       </v-list-item-content>
-        <v-tooltip bottom v-if="movable">
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              icon
-              v-bind="attrs"
-              v-on="on"
-              :disabled="isFirst"
-              @click.stop.prevent="$emit('moveUp')"
-            >
-              <v-icon
-                v-text="'mdi-arrow-up'"
-              ></v-icon>
-            </v-btn>
-          </template>
-          <span>Move up</span>
-        </v-tooltip>
-        <v-tooltip bottom v-if="movable">
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              icon
-              v-bind="attrs"
-              v-on="on"
-              :disabled="isLast"
-              @click.stop.prevent="$emit('moveDown')"
-            >
-              <v-icon
-                v-text="'mdi-arrow-down'"
-              ></v-icon>
-            </v-btn>
-          </template>
-          <span>Move down</span>
-        </v-tooltip>
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              icon
-              v-bind="attrs"
-              v-on="on"
-              @click.stop.prevent="copyItem"
-            >
-              <v-icon
-                v-text="'mdi-content-copy'"
-              ></v-icon>
-            </v-btn>
-          </template>
-          <span>Copy</span>
-        </v-tooltip>
-
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              icon
-              v-bind="attrs"
-              v-on="on"
-              @click.stop.prevent="duplicateItem"
-            >
-              <v-icon
-                v-text="'mdi-content-duplicate'"
-              ></v-icon>
-            </v-btn>
-          </template>
-          <span>Duplicate</span>
-        </v-tooltip>
-
-        <v-tooltip bottom>
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              icon
-              v-bind="attrs"
-              v-on="on"
-              @click.stop.prevent="deleteItem"
-            >
-              <v-icon
-                class="red--text text--lighten-2"
-                v-text="'mdi-delete'"
-              ></v-icon>
-            </v-btn>
-          </template>
-          <span>Delete</span>
-        </v-tooltip>
+      <v-tooltip bottom v-if="movable">
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            icon
+            v-bind="attrs"
+            v-on="on"
+            :disabled="isFirst"
+            @click.stop.prevent="$emit('moveUp')"
+          >
+            <v-icon
+              v-text="'mdi-arrow-up'"
+            ></v-icon>
+          </v-btn>
+        </template>
+        <span>Move up</span>
+      </v-tooltip>
+      <v-tooltip bottom v-if="movable">
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            icon
+            v-bind="attrs"
+            v-on="on"
+            :disabled="isLast"
+            @click.stop.prevent="$emit('moveDown')"
+          >
+            <v-icon
+              v-text="'mdi-arrow-down'"
+            ></v-icon>
+          </v-btn>
+        </template>
+        <span>Move down</span>
+      </v-tooltip>
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            icon
+            v-bind="attrs"
+            v-on="on"
+            @click.stop.prevent="copyItem"
+          >
+            <v-icon
+              v-text="'mdi-content-copy'"
+            ></v-icon>
+          </v-btn>
+        </template>
+        <span>Copy</span>
+      </v-tooltip>
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            icon
+            v-bind="attrs"
+            v-on="on"
+            @click.stop.prevent="duplicateItem"
+          >
+            <v-icon
+              v-text="'mdi-content-duplicate'"
+            ></v-icon>
+          </v-btn>
+        </template>
+        <span>Duplicate</span>
+      </v-tooltip>
+      <v-tooltip bottom>
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn
+            icon
+            v-bind="attrs"
+            v-on="on"
+            @click.stop.prevent="deleteItem"
+          >
+            <v-icon
+              class="red--text text--lighten-2"
+              v-text="'mdi-delete'"
+            ></v-icon>
+          </v-btn>
+        </template>
+        <span>Delete</span>
+      </v-tooltip>
       <v-tooltip bottom>
         <template v-slot:activator="{ on, attrs }">
           <v-btn

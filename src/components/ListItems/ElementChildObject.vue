@@ -34,29 +34,49 @@
             </template>
             <span>Add</span>
           </v-tooltip>
-          <v-tooltip
-              v-else-if="hasArrays || hasChildObjects"
+          <template v-else>
+            <v-tooltip
               bottom
             >
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn
-                icon
-                small
-                v-bind="attrs"
-                v-on="on"
-                @click.stop.prevent="opened=!opened"
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  icon
+                  v-bind="attrs"
+                  v-on="on"
+                  @click.stop.prevent="deleteItem"
+                >
+                  <v-icon
+                    class="red--text text--lighten-2"
+                    v-text="'mdi-delete'"
+                  ></v-icon>
+                </v-btn>
+              </template>
+              <span>Delete</span>
+            </v-tooltip>
+            <v-tooltip
+                v-if="hasArrays || hasChildObjects"
+                bottom
               >
-                <v-icon
-                  v-text="'mdi-chevron-down'"
-                  :class="{
-                    'openIcon': true,
-                    'openIcon__opened': opened
-                  }"
-                ></v-icon>
-              </v-btn>
-            </template>
-            <span>{{ opened ? 'Collapse' : 'Expand' }}</span>
-          </v-tooltip>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  icon
+                  small
+                  v-bind="attrs"
+                  v-on="on"
+                  @click.stop.prevent="opened=!opened"
+                >
+                  <v-icon
+                    v-text="'mdi-chevron-down'"
+                    :class="{
+                      'openIcon': true,
+                      'openIcon__opened': opened
+                    }"
+                  ></v-icon>
+                </v-btn>
+              </template>
+              <span>{{ opened ? 'Collapse' : 'Expand' }}</span>
+            </v-tooltip>
+          </template>
         </div>
       </v-list-item-icon>
     </v-list-item>
@@ -277,6 +297,19 @@ export default {
       }
 
       this.$emit('open-editor', { element: el, required: obj.required === 'true', parentDescription: obj })
+    },
+    async deleteItem() {
+      const { confirmed } = await this.$deleteConfirmationModal.open()
+
+      if (!confirmed) return;
+      const element = this.obj.element
+
+      element.parentNode.removeChild(element)
+      this.$store.dispatch('SchemaEditor/updateModel', { element, action: 'delete' })
+
+      if (element === this.$store.getters['SchemaEditor/openedElement']) {
+        this.$store.dispatch('SchemaEditor/closeEditor');
+      }
     }
   }
 }

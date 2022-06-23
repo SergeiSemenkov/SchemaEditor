@@ -98,9 +98,9 @@ export default {
       } catch (e) {
         this.$emit('cancel')
         if (e.message) {
-          this.$errorModal.$open(e.message)
+          this.$errorModal.open(e.message)
         } else {
-          this.$errorModal.$open('<b class="text-h6">Unable to load catalog list from the provided server</b>')
+          this.$errorModal.open('<b class="text-h6">Unable to load catalog list from the provided server</b>')
         }
       }
     },
