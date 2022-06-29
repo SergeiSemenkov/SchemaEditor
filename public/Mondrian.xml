@@ -8,6 +8,7 @@
   ==
   == Copyright (C) 2001-2005 Julian Hyde
   == Copyright (C) 2005-2019 Hitachi Vantara and others
+  == Copyright (C) 2019-2021 Topsoft
   == Copyright (C) 2021-2022 Sergei Semenkov
   == All Rights Reserved.
   ==
@@ -2474,6 +2475,9 @@ Revision is $Id$
     <Element type="DrillThroughAttribute" class="DrillThroughColumn">
         <Doc>
         </Doc>
+        <Attribute name="name" required="true">
+            <Doc></Doc>
+        </Attribute>
         <Attribute name="dimension" required="true">
             <Doc></Doc>
         </Attribute>
@@ -2490,6 +2494,9 @@ Revision is $Id$
         </Doc>
         <Attribute name="name" required="true">
             <Doc></Doc>
+        </Attribute>
+        <Attribute name="measure" required="true">
+            <Doc>Name of a measure.</Doc>
         </Attribute>
     </Element>
 
