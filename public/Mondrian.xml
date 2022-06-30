@@ -2580,6 +2580,135 @@ Revision is $Id$
         </Object>
     </Element>
 
+    <!-- DimensionAttribute ============================================== -->
+    <Element type="DimensionAttribute" >
+        <Doc>
+        </Doc>
+        <Attribute name="Name" type="String" required="true">
+            <Doc></Doc>
+        </Attribute>
+        <Attribute name="ID" type="String">
+            <Doc></Doc>
+        </Attribute>
+        <Attribute name="Description" type="String">
+            <Doc></Doc>
+        </Attribute>
+        <Attribute name="Usage">
+            <Doc></Doc>
+            <Value>Regular</Value>
+            <Value>Key</Value>
+            <Value>Parent</Value>
+        </Attribute>
+        <Attribute name="EstimatedCount" type="Long">
+            <Doc></Doc>
+        </Attribute>
+        <Array name="KeyColumns" type="DataItem">
+            <Doc></Doc>
+        </Array>
+        <Attribute name="NameColumn" type="DataItem">
+            <Doc></Doc>
+        </Attribute>
+        <Attribute name="ValueColumn" type="DataItem">
+            <Doc></Doc>
+        </Attribute>
+        <Attribute name="OrderBy">
+            <Doc></Doc>
+            <Value>Key</Value>
+            <Value>Name</Value>
+            <Value>AttributeKey</Value>
+            <Value>AttributeName</Value>
+        </Attribute>
+        <Attribute name="DefaultMember" type="String">
+            <Doc></Doc>
+        </Attribute>
+        <Attribute name="IsAggregatable" type="Boolean">
+            <Doc></Doc>
+        </Attribute>
+        <Attribute name="AttributeHierarchyEnabled" type="Boolean">
+            <Doc></Doc>
+        </Attribute>
+        <Attribute name="AttributeHierarchyVisible" type="Boolean">
+            <Doc></Doc>
+        </Attribute>
+        <Attribute name="AttributeHierarchyDisplayFolder" type="String">
+            <Doc></Doc>
+        </Attribute>
+    </Element>
+
+    <Element type="DataItem" >
+        <Doc>
+        </Doc>
+        <Attribute name="DataType" required="true">
+            <Doc></Doc>
+            <Value>WChar</Value>
+            <Value>Integer</Value>
+            <Value>BigInt</Value>
+            <Value>Single</Value>
+            <Value>Double</Value>
+            <Value>Date</Value>
+            <Value>Currency</Value>
+            <Value>UnsignedTinyInt</Value>
+            <Value>UnsignedSmallInt</Value>
+            <Value>UnsignedInt</Value>
+            <Value>UnsignedBigInt</Value>
+            <Value>Bool</Value>
+            <Value>Smallint</Value>
+            <Value>Tinyint</Value>
+            <Value>Binary</Value>
+        </Attribute>
+        <Attribute name="DataSize" type="Integer">
+            <Doc></Doc>
+        </Attribute>
+        <Attribute name="MimeType" type="String">
+            <Doc></Doc>
+        </Attribute>
+        <Attribute name="NullProcessing">
+            <Doc></Doc>
+            <Value>Preserve</Value>
+            <Value>Error</Value>
+            <Value>UnknownMember</Value>
+            <Value>ZeroOrBlank</Value>
+            <Value>Automatic</Value>
+        </Attribute>
+        <Attribute name="Trimming">
+            <Doc></Doc>
+            <Value>Left</Value>
+            <Value>Right</Value>
+            <Value>LeftRight</Value>
+            <Value>None</Value>
+        </Attribute>
+        <Attribute name="InvalidXmlCharacters">
+            <Doc></Doc>
+            <Value>Preserve</Value>
+            <Value>Remove</Value>
+            <Value>Replace</Value>
+        </Attribute>
+        <Attribute name="Collation" type="String">
+            <Doc></Doc>
+        </Attribute>
+        <Attribute name="Format">
+            <Doc></Doc>
+            <Value>TrimRight</Value>
+            <Value>TrimLeft</Value>
+            <Value>TrimAll</Value>
+            <Value>TrimNone</Value>
+        </Attribute>
+        <Attribute name="Source" type="ColumnBinding">
+            <Doc></Doc>
+        </Attribute>
+    </Element>
+
+    <Element type="ColumnBinding" >
+        <Doc>
+        </Doc>
+        <Attribute name="TableID" type="String" required="true">
+            <Doc></Doc>
+        </Attribute>
+        <Attribute name="ColumnID" type="String" required="true">
+            <Doc></Doc>
+        </Attribute>
+    </Element>
+
 </Model>
 
 <!-- End Mondrian.xml -->
