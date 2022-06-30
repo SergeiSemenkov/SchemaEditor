@@ -493,6 +493,8 @@ Revision is $Id$
             </Doc>
         </Attribute>
 
+        <Array name="Attributes" type="DimensionAttribute"><Doc></Doc></Array>
+
         <Array name="hierarchies" type="Hierarchy"><Doc></Doc></Array>
         <Code>
             // implement CubeDimension
