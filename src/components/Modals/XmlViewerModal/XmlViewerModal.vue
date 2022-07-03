@@ -4,13 +4,13 @@
     persistent
     fullscreen
   >
-    <v-card class="d-flex flex-column">
+    <v-card class="d-flex flex-column" style="top: 64px; z-index: 100;">
       <v-toolbar
         dark
         color="primary"
-        class="flex-grow-0"
+        class="flex-grow-0 fixed-toolbar"
       >
-        <v-toolbar-title>XML Viewer</v-toolbar-title>
+        <v-toolbar-title>XML Editor</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn
           class="mr-2"
@@ -90,3 +90,10 @@ export default {
   }
 }
 </script>
+<style scoped>
+.fixed-toolbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+}
+</style>

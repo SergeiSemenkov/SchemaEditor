@@ -11,6 +11,8 @@
         dark
         color="primary"
       >
+        <v-toolbar-title>Validation</v-toolbar-title>
+        <v-spacer />
         <v-btn
           icon
           dark
@@ -18,7 +20,6 @@
         >
           <v-icon>mdi-close</v-icon>
         </v-btn>
-        <v-toolbar-title>Validation</v-toolbar-title>
       </v-toolbar>
       <v-container>
         <v-row class="mt-2">

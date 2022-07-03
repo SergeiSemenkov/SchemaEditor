@@ -337,7 +337,7 @@ export default {
     },
     openXmlContent() {
       this.$xmlViewerModal.open(this.element, async (newElement) => {
-        // try {
+        try {
           const parser = new DOMParser()
           const updatedElement = parser.parseFromString(newElement, "text/xml").documentElement
           console.log(updatedElement)
@@ -352,13 +352,13 @@ export default {
           await this.$nextTick()
           this.$store.dispatch('SchemaEditor/openEditor', { element: updatedElement })
           this.$successModal.open(`<b class="text-h6">Schema was succesfully saved</b>`)
-        // } catch (e) {
-        //   if (e.message) {
-        //     this.$errorModal.open(`<b class="text-h6">Unable to save xml element: </b><br/><p>'${e.message}'</p>`)
-        //   } else {
-        //     this.$errorModal.open(`<b class="text-h6">Unable to save xml element.</b>`)
-        //   }
-        // }
+        } catch (e) {
+          if (e.message) {
+            this.$errorModal.open(`<b class="text-h6">Unable to save xml element: </b><br/><p>'${e.message}'</p>`)
+          } else {
+            this.$errorModal.open(`<b class="text-h6">Unable to save xml element.</b>`)
+          }
+        }
       });
     }
 }
