@@ -239,9 +239,10 @@ export default {
             throw new Error(`<b class="text-h6">Server returned error responce</b><br><b>Error code:</b> ${errorCode}<br><b>Error message:</b> ${errorMessage}`)
           }
 
-          const schema = metadata.querySelector('row > METADATA').childNodes[0]
+          const schema = metadata.querySelector('row > METADATA').childNodes[0].wholeText
           const parser = new DOMParser()
-          const xmlDoc = parser.parseFromString(schema.wholeText, "text/xml")
+          const xmlDoc = parser.parseFromString(schema, "text/xml")
+          this.$store.dispatch('SchemaEditor/setInitialSchemaState', { schema, serverUrl, catalogName: catalog.name })
           this.$store.dispatch('SchemaEditor/openSchema', { xmlDoc })
           this.$store.dispatch('SchemaEditor/closeEditor'); 
         } catch (e) {
@@ -289,9 +290,29 @@ export default {
         .replaceAll('\n', '&#10;')
         .replaceAll('\r', '&#13;')
       try {
+        const initialSchemaState = this.$store.getters['SchemaEditor/initialSchemaState']
+        const metadata = await fetchSchemaForCatalog(serverUrl, catalogName)
+
+        let isErrorResponce = metadata.querySelector('Fault')
+        if (isErrorResponce) {
+          const error = isErrorResponce.querySelector('detail > Error')
+          const errorMessage = error.getAttribute('Description')
+          const errorCode = error.getAttribute('ErrorCode')
+          throw new Error(`<b class="text-h6">Error while saving schema occured</b><br><b>Error code:</b> ${errorCode}<br><b>Error message:</b> ${errorMessage}`)
+        }
+        const schemaOnServer = metadata.querySelector('row > METADATA').childNodes[0].wholeText
+
+        if (initialSchemaState.serverUrl === serverUrl
+         && initialSchemaState.catalogName === catalogName
+         && initialSchemaState.schema !== schemaOnServer
+        ) {
+          const { confirmed } = await this.$confirmationModal.open('Schema was modified while you were working on it. Do you want to override currently saved one with your changes?')
+          if (!confirmed) return;
+        }
+        
         const saveResponce = await saveSchemaToCatalog(serverUrl, catalogName, schemaEncoded)
 
-        const isErrorResponce = saveResponce.querySelector('Fault')
+        isErrorResponce = saveResponce.querySelector('Fault')
         if (isErrorResponce) {
           const error = isErrorResponce.querySelector('detail > Error')
           const errorMessage = error.getAttribute('Description')
@@ -301,6 +322,22 @@ export default {
 
         const successResponce = saveResponce.querySelector('ExecuteResponse')
         if (successResponce) {
+          if (initialSchemaState.serverUrl === serverUrl
+            && initialSchemaState.catalogName === catalogName
+            && initialSchemaState.schema !== schemaOnServer
+          ) {
+            const updatedMetadata = await fetchSchemaForCatalog(serverUrl, catalogName)
+            isErrorResponce = saveResponce.querySelector('Fault')
+            if (isErrorResponce) {
+              const error = isErrorResponce.querySelector('detail > Error')
+              const errorMessage = error.getAttribute('Description')
+              const errorCode = error.getAttribute('ErrorCode')
+              throw new Error(`<b class="text-h6">Error while saving schema occured</b><br><b>Error code:</b> ${errorCode}<br><b>Error message:</b> ${errorMessage}`)
+            }
+            const updatedSchema = updatedMetadata.querySelector('row > METADATA').childNodes[0].wholeText
+            this.$store.dispatch('SchemaEditor/setInitialSchemaState', { schema: updatedSchema, serverUrl, catalogName })
+          }
+
           this.$successModal.open(`<b class="text-h6">Schema was succesfully saved</b>`)
         } else {
           throw new Error('<b class="text-h6">Something went wrong while saving schema to the server</b>')

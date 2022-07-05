@@ -11,6 +11,11 @@ const state = () => ({
   openedElement: null,
   openedElementFocusedAttribute: null,
   modelCursor: 0,
+  initialSchemaState: {
+    serverUrl: null,
+    catalogName: null,
+    schema: null,
+  },
 })
 
 let modelHistory = [];
@@ -69,6 +74,9 @@ const getters = {
       return true
     }
     return false
+  },
+  initialSchemaState(state) {
+    return state.initialSchemaState
   }
 }
 
@@ -166,6 +174,13 @@ const actions = {
 
     commit('setTimestamp', { timestamp })
   },
+  setInitialSchemaState({ commit }, { schema, serverUrl, catalogName}) {
+    commit('setInitialSchema', { 
+      schema,
+      serverUrl,
+      catalogName
+    })
+  }
 }
 
 // mutations
@@ -173,6 +188,11 @@ const mutations = {
   setSchema(state, { xmlDoc }) {
     state.xmlDoc = xmlDoc
     state.timestamp = Date.now()
+  },
+  setInitialSchema(state, { schema, serverUrl, catalogName }) {
+    state.initialSchemaState.schema = schema
+    state.initialSchemaState.serverUrl = serverUrl
+    state.initialSchemaState.catalogName = catalogName
   },
   setLastSavedSchema(state, { serializedSchema }) {
     state.lastSavedSchema = serializedSchema

@@ -10,7 +10,7 @@
       </v-card-title>
       <v-card-text>
         <p class="pt-6">
-          Schema has unsaved changes. Are you sure you want to continue?
+          {{ text }}
         </p>
       </v-card-text>
       <v-card-actions>
@@ -35,6 +35,12 @@
 
 <script>
 export default {
+  props: {
+    text: {
+      type: String,
+      default: 'Schema has unsaved changes. Are you sure you want to continue?',
+    },
+  },
   data() {
     return {
       opened: true

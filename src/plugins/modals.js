@@ -1,5 +1,5 @@
 import vuetify from './vuetify'
-import HasChangesModal from '../components/Modals/HasChangesModal.vue'
+import ConfirmationModal from '../components/Modals/ConfirmationModal.vue'
 import ErrorModal from '../components/Modals/ErrorModal.vue'
 import SuccessModal from '../components/Modals/SuccessModal.vue'
 import CatalogSelectionModal from '../components/Modals/CatalogSelectionModal.vue'
@@ -14,15 +14,18 @@ import { pasteModal } from '../components/Modals/PasteModal'
 const Modals = {
   install(Vue) {
     Vue.prototype.$confirmationModal = {
-      open() {
+      open(text) {
         let resolveFunction = null;
         const confirmationPromise = new Promise((res) => {
           resolveFunction = res
         })
         
-        var ComponentClass = Vue.extend(HasChangesModal)
+        var ComponentClass = Vue.extend(ConfirmationModal)
         var instance = new ComponentClass({
           vuetify,
+          propsData: {
+            text,
+          }
         });
         instance.$mount()
 
