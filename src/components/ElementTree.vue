@@ -45,6 +45,7 @@ export default {
   watch: {
     async openedElement(newVal) {
       await this.$nextTick()
+      await this.$nextTick()
       this.updateEditorState(newVal)
     }
   },

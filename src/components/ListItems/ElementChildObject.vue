@@ -265,7 +265,7 @@ export default {
         const elSeparator = this.obj.element.parentNode.childNodes[elIndex - 1]
             
         let newtext = '\n'
-        if (elSeparator.nodeType === 3) {
+        if (elSeparator?.nodeType === 3) {
           newtext = elSeparator.textContent + '  '
           newtext = newtext.replace(/\n+/, '\n')
         }
