@@ -61,7 +61,7 @@ Revision is $Id$
                 This schema's parameter definitions.
             </Doc>
         </Array>
-        <Array name="sqls" type="SchemaSQL">
+        <Array name="views" type="View">
             <Doc>
                 Views described at schema level.
             </Doc>
@@ -1471,9 +1471,25 @@ Revision is $Id$
         </Code>
     </Element>
 
-    <Element type="SchemaSQL" class="SQL">
-        <Doc>A SQL described at schema level.</Doc>
-        <Attribute name="name" required="true"/>
+    <Element type="SchemaView" class="Relation">
+        <Doc>
+            Link to a schema level view.
+        </Doc>
+        <Attribute name="source" required="true"/>
+        <Attribute name="alias" required="true"/>
+        <Code>
+            public SchemaView find(String seekAlias) {
+                if (seekAlias.equals(alias)) {
+                    return this;
+                } else {
+                    return null;
+                }
+            }
+
+            public String getAlias() {
+                return alias;
+            }
+        </Code>
     </Element>
 
     <Element type="Join" class="RelationOrJoin">
