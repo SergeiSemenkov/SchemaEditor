@@ -1476,7 +1476,7 @@ Revision is $Id$
             Link to a schema level view.
         </Doc>
         <Attribute name="source" required="true">
-            <Reference xPath="/Schema/View" attribute="alias"></Reference>
+            <Reference xPath="/ancestor::Schema/View" attribute="alias"></Reference>
         </Attribute>
         <Attribute name="alias" required="true"/>
         <Code>
