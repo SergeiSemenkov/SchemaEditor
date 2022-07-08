@@ -1475,7 +1475,9 @@ Revision is $Id$
         <Doc>
             Link to a schema level view.
         </Doc>
-        <Attribute name="source" required="true"/>
+        <Attribute name="source" required="true">
+            <Reference xPath="/Schema/View" attribute="alias"></Reference>
+        </Attribute>
         <Attribute name="alias" required="true"/>
         <Code>
             public SchemaView find(String seekAlias) {
