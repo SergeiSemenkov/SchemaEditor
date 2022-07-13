@@ -2614,53 +2614,53 @@ Revision is $Id$
     <Element type="DimensionAttribute" >
         <Doc>
         </Doc>
-        <Attribute name="Name" type="String" required="true">
+        <Attribute name="name" type="String" required="true">
             <Doc></Doc>
         </Attribute>
-        <Attribute name="ID" type="String">
+        <Attribute name="id" type="String">
             <Doc></Doc>
         </Attribute>
-        <Attribute name="Description" type="String">
+        <Attribute name="description" type="String">
             <Doc></Doc>
         </Attribute>
-        <Attribute name="Usage">
+        <Attribute name="usage">
             <Doc></Doc>
             <Value>Regular</Value>
             <Value>Key</Value>
             <Value>Parent</Value>
         </Attribute>
-        <Attribute name="EstimatedCount" type="Long">
+        <Attribute name="estimatedCount" type="Long">
             <Doc></Doc>
         </Attribute>
-        <Array name="KeyColumns" type="DataItem">
+        <Array name="keyColumns" type="DataItem">
             <Doc></Doc>
         </Array>
-        <Attribute name="NameColumn" type="DataItem">
+        <Object name="nameColumn" type="DataItem">
             <Doc></Doc>
-        </Attribute>
-        <Attribute name="ValueColumn" type="DataItem">
+        </Object>
+        <Object name="valueColumn" type="DataItem">
             <Doc></Doc>
-        </Attribute>
-        <Attribute name="OrderBy">
+        </Object>
+        <Attribute name="orderBy">
             <Doc></Doc>
             <Value>Key</Value>
             <Value>Name</Value>
             <Value>AttributeKey</Value>
             <Value>AttributeName</Value>
         </Attribute>
-        <Attribute name="DefaultMember" type="String">
+        <Attribute name="defaultMember" type="String">
             <Doc></Doc>
         </Attribute>
-        <Attribute name="IsAggregatable" type="Boolean">
+        <Attribute name="isAggregatable" type="Boolean">
             <Doc></Doc>
         </Attribute>
-        <Attribute name="AttributeHierarchyEnabled" type="Boolean">
+        <Attribute name="attributeHierarchyEnabled" type="Boolean">
             <Doc></Doc>
         </Attribute>
-        <Attribute name="AttributeHierarchyVisible" type="Boolean">
+        <Attribute name="attributeHierarchyVisible" type="Boolean">
             <Doc></Doc>
         </Attribute>
-        <Attribute name="AttributeHierarchyDisplayFolder" type="String">
+        <Attribute name="attributeHierarchyDisplayFolder" type="String">
             <Doc></Doc>
         </Attribute>
     </Element>
@@ -2668,7 +2668,7 @@ Revision is $Id$
     <Element type="DataItem" >
         <Doc>
         </Doc>
-        <Attribute name="DataType" required="true">
+        <Attribute name="dataType" required="true">
             <Doc></Doc>
             <Value>WChar</Value>
             <Value>Integer</Value>
@@ -2686,13 +2686,13 @@ Revision is $Id$
             <Value>Tinyint</Value>
             <Value>Binary</Value>
         </Attribute>
-        <Attribute name="DataSize" type="Integer">
+        <Attribute name="dataSize" type="Integer">
             <Doc></Doc>
         </Attribute>
-        <Attribute name="MimeType" type="String">
+        <Attribute name="mimeType" type="String">
             <Doc></Doc>
         </Attribute>
-        <Attribute name="NullProcessing">
+        <Attribute name="nullProcessing">
             <Doc></Doc>
             <Value>Preserve</Value>
             <Value>Error</Value>
@@ -2700,41 +2700,41 @@ Revision is $Id$
             <Value>ZeroOrBlank</Value>
             <Value>Automatic</Value>
         </Attribute>
-        <Attribute name="Trimming">
+        <Attribute name="trimming">
             <Doc></Doc>
             <Value>Left</Value>
             <Value>Right</Value>
             <Value>LeftRight</Value>
             <Value>None</Value>
         </Attribute>
-        <Attribute name="InvalidXmlCharacters">
+        <Attribute name="invalidXmlCharacters">
             <Doc></Doc>
             <Value>Preserve</Value>
             <Value>Remove</Value>
             <Value>Replace</Value>
         </Attribute>
-        <Attribute name="Collation" type="String">
+        <Attribute name="collation" type="String">
             <Doc></Doc>
         </Attribute>
-        <Attribute name="Format">
+        <Attribute name="format">
             <Doc></Doc>
             <Value>TrimRight</Value>
             <Value>TrimLeft</Value>
             <Value>TrimAll</Value>
             <Value>TrimNone</Value>
         </Attribute>
-        <Attribute name="Source" type="ColumnBinding">
+        <Object name="source" type="ColumnBinding">
             <Doc></Doc>
-        </Attribute>
+        </Object>
     </Element>
 
     <Element type="ColumnBinding" >
         <Doc>
         </Doc>
-        <Attribute name="TableID" type="String" required="true">
+        <Attribute name="tableID" type="String" required="true">
             <Doc></Doc>
         </Attribute>
-        <Attribute name="ColumnID" type="String" required="true">
+        <Attribute name="columnID" type="String" required="true">
             <Doc></Doc>
         </Attribute>
     </Element>
