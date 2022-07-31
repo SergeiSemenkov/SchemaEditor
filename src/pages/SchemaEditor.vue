@@ -6,7 +6,11 @@
       color="primary"
       dark
     >
-      <v-toolbar-title>eMondrian schema editor</v-toolbar-title>
+      <v-toolbar-title>
+        <span class="mr-4">eMondrian schema editor</span>
+        <span v-if="loadedFrom.catalogName">Catalog: {{ loadedFrom.catalogName }}</span>
+        <span v-else-if="fileName">File: {{ fileName }}</span>
+      </v-toolbar-title>
       <v-spacer />
       <v-btn
         @click="createNewSchema"
@@ -178,6 +182,12 @@ export default {
     },
     canRedo() {
       return this.$store.getters['SchemaEditor/canRedo']
+    },
+    loadedFrom() {
+      return this.$store.getters['SchemaEditor/loadedFrom']
+    },
+    fileName() {
+      return this.$store.getters['SchemaEditor/fileName']
     }
   },
 
@@ -219,6 +229,7 @@ export default {
       const parser = new DOMParser()
       const xmlDoc = parser.parseFromString(xmlContent, "text/xml")
 
+      this.$store.dispatch('SchemaEditor/setFilename', { fileName: schemaFile.name })
       this.$store.dispatch('SchemaEditor/openSchema', { xmlDoc });
       this.$store.dispatch('SchemaEditor/closeEditor'); 
     },
