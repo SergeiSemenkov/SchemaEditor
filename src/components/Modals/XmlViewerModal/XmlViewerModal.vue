@@ -3,35 +3,39 @@
     v-model="opened"
     persistent
     fullscreen
+    scrollable
   >
-    <v-card class="d-flex flex-column" style="top: 64px; z-index: 100;">
-      <v-toolbar
-        dark
-        color="primary"
-        class="flex-grow-0 fixed-toolbar"
-      >
-        <v-toolbar-title>XML Editor</v-toolbar-title>
-        <v-spacer></v-spacer>
-        <v-btn
-          class="mr-2"
-          @click="save"
-        >
-          Save
-        </v-btn>
-        <v-btn
-          icon
+    <v-card class="d-flex flex-column" style="z-index: 100;">
+      <v-card-title class="pa-0">
+        <v-toolbar
           dark
-          @click="callCloseAction"
+          color="primary"
         >
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-      </v-toolbar>
+          <v-toolbar-title>XML Editor</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn
+            class="mr-2"
+            @click="save"
+          >
+            Save
+          </v-btn>
+          <v-btn
+            icon
+            dark
+            @click="callCloseAction"
+          >
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-toolbar>
+      </v-card-title>
       <v-card-text class="pt-5 flex-grow-1 h-full" ref="cardContent">
-        <v-textarea
-          v-model="xmlContent"
-          ref="textArea"
-        >
-        </v-textarea>
+        <div class="h-full">
+          <v-textarea
+            v-model="xmlContent"
+            ref="textArea"
+          >
+          </v-textarea>
+        </div>
       </v-card-text>
     </v-card>
   </v-dialog>
