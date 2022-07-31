@@ -87,10 +87,12 @@ export default {
       openedItem: null,
       openedItemKey: null,
       serverUrl: '../xmla',
+      // serverUrl: 'https://ssemenkoff.dev/emondrian/xmla',
     };
   },
   async mounted() {
     try {
+      const loadingModal = this.$loadingModal.open();
       const metadata = await fetchDatabasesList(this.serverUrl);
 
       const isErrorResponce = metadata.querySelector('Fault')
@@ -104,6 +106,7 @@ export default {
       const databasesSchema = metadata.querySelector('row > METADATA').childNodes[0]
       const parser = new DOMParser()
       this.xmlDoc = parser.parseFromString(databasesSchema.wholeText, "text/xml")
+      loadingModal.close();
     } catch (e) {
       if (e.message) {
         this.$errorModal.open(e.message)

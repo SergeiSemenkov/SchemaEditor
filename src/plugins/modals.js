@@ -10,6 +10,7 @@ import SchemaValidationModal from '../components/Modals/SchemaValidationModal.vu
 import DiagramModal from '../components/Modals/DiagramModal.vue'
 import { xmlViewerModal } from '../components/Modals/XmlViewerModal'
 import { pasteModal } from '../components/Modals/PasteModal'
+import LoadingModal from '../components/Modals/LoadingModal'
 
 const Modals = {
   install(Vue) {
@@ -280,6 +281,19 @@ const Modals = {
           }, 500);
         });
         document.body.appendChild(instance.$el)
+      },
+    }
+
+    Vue.prototype.$loadingModal = {
+      open() {
+        var ComponentClass = Vue.extend(LoadingModal)
+        var instance = new ComponentClass({
+          vuetify,
+        });
+        instance.$mount()
+
+        document.body.appendChild(instance.$el)
+        return instance
       },
     }
 
