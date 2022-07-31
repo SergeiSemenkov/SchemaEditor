@@ -8,7 +8,7 @@
         <v-col cols=10 class="capitalize">
           DataSources
         </v-col>
-         <v-col cols=2>
+         <!-- <v-col cols=2>
             <v-tooltip
               bottom
             >
@@ -24,7 +24,7 @@
               </template>
               <span>Add</span>
             </v-tooltip>
-          </v-col>
+          </v-col> -->
       </v-row>
       <v-divider />
       <data-source-tree-item
