@@ -86,25 +86,24 @@
             Catalogs
           </v-col>
           <v-spacer />
-          <!-- <v-col cols=1>
+          <v-col cols=1>
             <v-tooltip
-                v-if="canPaste"
-                bottom
-              >
-                <template v-slot:activator="{ on, attrs }">
-                  <v-btn
-                    icon
-                    v-bind="attrs"
-                    v-on="on"
-                    @click="pasteItem"
-                  >
-                    <v-icon>mdi-content-paste</v-icon>
-                  </v-btn>
-                </template>
-                <span>Paste</span>
-              </v-tooltip>
-          </v-col> -->
-          <v-col cols=2>
+              bottom
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  icon
+                  v-bind="attrs"
+                  v-on="on"
+                  @click="pasteItem"
+                >
+                  <v-icon>mdi-content-paste</v-icon>
+                </v-btn>
+              </template>
+              <span>Paste</span>
+            </v-tooltip>
+          </v-col>
+          <v-col cols=1>
             <v-tooltip
               bottom
             >
@@ -192,7 +191,39 @@ export default {
     },
     deleteItem() {
       this.$emit('removeItem', this.element)
-    }
+    },
+    async pasteItem() {
+      const { status, xml } = await this.$pasteModal.open()
+      if (status !== 'success') return;
+      const parser = new DOMParser()
+      const item = parser.parseFromString(xml, "text/xml")
+      const elementToPaste = item.documentElement
+      const possibleToPaste = elementToPaste.tagName === 'Catalog'
+      if (!possibleToPaste) {
+        this.$errorModal.open(`<b class="text-h6">Item from your clipboard can't be pasted here</b>`)
+        return
+      }
+
+      if (this.catalogs.length) {
+        this.catalogs[this.catalogs.length - 1].insertAdjacentElement('afterend', elementToPaste)
+
+        const itemIndex = Array.from(elementToPaste.parentNode.children).indexOf(elementToPaste)
+        const prevItem = elementToPaste.parentNode.children[itemIndex - 1]
+        const prevItemNodeIndex = Array.from(elementToPaste.parentNode.childNodes).indexOf(prevItem)
+        const prevItemSeparator = elementToPaste.parentNode.childNodes[prevItemNodeIndex - 1]
+        let newtext = '\n'
+        if (prevItemSeparator.nodeType === 3) {
+          newtext = prevItemSeparator.textContent
+        }
+
+        elementToPaste.insertAdjacentHTML('beforebegin', newtext)
+      } 
+
+      const keyProp = `Catalog_${this.catalogs.length - 1}__${this.keyProp}`
+      
+      this.$emit('updateModel');
+      this.$emit('openItem',  { element: elementToPaste, key: keyProp })
+    },
   }
 }
 </script>
