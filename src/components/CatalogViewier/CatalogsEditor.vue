@@ -96,7 +96,7 @@ export default {
         let definitionEl = this.element.querySelector('Definition');
         if (!definitionEl) {
           definitionEl = document.createElementNS(null, 'Definition')
-          this.element.insertAdjacentElement('afterbegin', definitionEl)
+          this.element.insertAdjacentElement('beforeend', definitionEl)
         }
         definitionEl.innerHTML = value;
       } else {
@@ -118,7 +118,7 @@ export default {
         let dataSourceInfoEl = this.element.querySelector('DataSourceInfo');
         if (!dataSourceInfoEl) {
           dataSourceInfoEl = document.createElementNS(null, 'DataSourceInfo')
-          this.element.insertAdjacentElement('beforeend', dataSourceInfoEl)
+          this.element.insertAdjacentElement('afterbegin', dataSourceInfoEl)
         }
         dataSourceInfoEl.innerHTML = value;
       } else {

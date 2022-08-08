@@ -103,7 +103,7 @@
               <span>Paste</span>
             </v-tooltip>
           </v-col>
-          <v-col cols=1>
+          <v-col cols=2>
             <v-tooltip
               bottom
             >
