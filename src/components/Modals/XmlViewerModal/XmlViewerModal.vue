@@ -28,13 +28,14 @@
           </v-btn>
         </v-toolbar>
       </v-card-title>
-      <v-card-text class="pt-5 flex-grow-1 h-full" ref="cardContent">
-        <div class="h-full">
-          <v-textarea
+      <v-card-text class="pt-5" ref="cardContent">
+        <div>
+          <!-- <v-textarea
             v-model="xmlContent"
             ref="textArea"
           >
-          </v-textarea>
+          </v-textarea> -->
+          <div ref="editor"></div>
         </div>
       </v-card-text>
     </v-card>
@@ -42,14 +43,26 @@
 </template>
 
 <script>
+import * as monaco from 'monaco-editor';
+
 export default {
   mounted() {
     const serializer = new XMLSerializer
     const xmlContent = serializer.serializeToString(this.element)
     this.xmlContent = xmlContent
     this.lastSavedElement = xmlContent
-    this.expandTextArea();
     document.querySelector('html').style="overflow: hidden";
+
+    const cardContent = this.$refs.cardContent;
+    const el = this.$refs.editor;
+
+    el.style.width = `${cardContent.clientWidth}px`;
+    el.style.height = `${cardContent.clientHeight}px`;
+
+    this.editor = monaco.editor.create(el, {
+      value: this.xmlContent,
+      language: 'xml',
+    });
   },
   destroyed() {
     document.querySelector('html').style="";
@@ -71,12 +84,9 @@ export default {
     close() {
       this.opened = false
     },
-    async expandTextArea() {
-      await this.$nextTick();
-      const textArea = this.$refs.textArea.$el.querySelector('textarea');
-      textArea.style.height = textArea.scrollHeight + "px";
-    },
     async save() {
+      this.xmlContent = this.editor.getModel().getValue();
+
       this.lastSavedElement = this.xmlContent
       this.$emit('saveElement', this.xmlContent);
     },
@@ -87,6 +97,8 @@ export default {
       }
     },
     async checkChanges() {
+      this.xmlContent = this.editor.getModel().getValue();
+
       return this.lastSavedElement !== this.xmlContent
         ? this.$confirmationModal.open()
         : { confirmed: true }

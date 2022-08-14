@@ -43,19 +43,21 @@
         </v-tooltip>
       </v-col>
     </v-row>
-    <element-list-item
-      v-for="(item, idx) in arrayItems" 
-      class="child_item"
-      :key="`${arrayDescription.type}-${getElementName(item)}-${idx}`"
-      :element="item"
-      :timestamp="timestamp"
-      movable
-      :isFirst="idx === 0"
-      :isLast="idx === arrayItems.length - 1"
-      @moveUp="moveUp(item, arrayItems[idx - 1])"
-      @moveDown="moveDown(item, arrayItems[idx + 1])"
-      @open-editor="openChildElement"
-    />
+    <draggable v-model="arrayItems" @end="dragEnd">
+      <element-list-item
+        v-for="(item, idx) in arrayItems" 
+        class="child_item"
+        :key="`${arrayDescription.type}-${getElementName(item)}-${idx}`"
+        :element="item"
+        :timestamp="timestamp"
+        movable
+        :isFirst="idx === 0"
+        :isLast="idx === arrayItems.length - 1"
+        @moveUp="moveUp(item, arrayItems[idx - 1])"
+        @moveDown="moveDown(item, arrayItems[idx + 1])"
+        @open-editor="openChildElement"
+      />
+    </draggable>
     <v-dialog
       v-model="dialogOpened"
       width="500"
@@ -92,10 +94,12 @@
 
 <script>
 import xmlDescriptionMixin from '../../mixins/xmlDescriptionMixin'
+import draggable from 'vuedraggable'
 
 export default {
   components: { 
-    ElementListItem: () => import('./ElementListItem.vue')
+    ElementListItem: () => import('./ElementListItem.vue'),
+    draggable,
   },
   name: 'ElementChildArray',
   mixins: [
@@ -122,11 +126,13 @@ export default {
     },
   },
   computed: {
-    arrayItems() {
-      this.timestamp
-      
-      const items = Array.from(this.element.querySelectorAll(`:scope > ${this.possibleElements.join(', :scope >')}`))
-      return items
+    arrayItems: {
+      get() {
+        this.timestamp
+        return Array.from(this.element.querySelectorAll(`:scope > ${this.possibleElements.join(', :scope >')}`))
+      },
+      set() {
+      }
     },
     possibleElements() {
       this.timestamp
@@ -134,6 +140,19 @@ export default {
     }
   },
   methods: {
+    dragEnd({ oldIndex, newIndex }) {
+      const items = Array.from(this.element.querySelectorAll(`:scope > ${this.possibleElements.join(', :scope >')}`)) 
+
+      items[oldIndex].parentNode.removeChild(items[oldIndex]);
+      if (oldIndex > newIndex) {
+        items[newIndex].insertAdjacentElement('beforeBegin', items[oldIndex])
+      } else {
+        items[newIndex].insertAdjacentElement('afterend', items[oldIndex])
+      }
+
+      this.$store.dispatch('SchemaEditor/updateModel', { element: this.element, action: 'reorder' })
+      this.$store.dispatch('SchemaEditor/closeEditor')
+    },
     getElementName(element) {
       return element.getAttribute('name')
     },

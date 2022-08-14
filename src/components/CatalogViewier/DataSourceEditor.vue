@@ -186,17 +186,12 @@ export default {
       this.$emit('updateModel');
     },
     setDataSourceInfo(value) {
-      if (value) {
-        let dataSourceInfo = this.element.querySelector('DataSourceInfo');
-        if (!dataSourceInfo) {
-          dataSourceInfo = document.createElementNS(null, 'DataSourceInfo')
-          this.element.appendChild(dataSourceInfo)
-        }
-        dataSourceInfo.innerHTML = value;
-      } else {
-        let dataSourceInfo = this.element.querySelector('DataSourceInfo');
-        if (dataSourceInfo) this.element.removeChild(dataSourceInfo)
+      let dataSourceInfo = this.element.querySelector('DataSourceInfo');
+      if (!dataSourceInfo) {
+        dataSourceInfo = document.createElementNS(null, 'DataSourceInfo')
+        this.element.appendChild(dataSourceInfo)
       }
+      dataSourceInfo.innerHTML = value || '';
       this.$emit('updateModel');
     },
     setProviderName(value) {

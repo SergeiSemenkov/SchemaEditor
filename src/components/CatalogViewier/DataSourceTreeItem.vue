@@ -121,15 +121,17 @@
             </v-tooltip>
           </v-col>
         </v-row>
-        <catalog-list-item
-          v-for="(i, idx) in catalogs" 
-          :key="idx"
-          :element="i"
-          :timestamp="timestamp"
-          :key-prop="`Catalog_${idx}__${keyProp}`"
-          @openItem="$emit('openItem', $event)"
-          @removeItem="$emit('removeItem', $event)"
-        />
+        <draggable v-model="catalogs" @end="dragEnd">
+          <catalog-list-item
+            v-for="(i, idx) in catalogs" 
+            :key="idx"
+            :element="i"
+            :timestamp="timestamp"
+            :key-prop="`Catalog_${idx}__${keyProp}`"
+            @openItem="$emit('openItem', $event)"
+            @removeItem="$emit('removeItem', $event)"
+          />
+        </draggable>
       </div>
     </div>
   </div>
@@ -137,10 +139,12 @@
 
 <script>
 import CatalogListItem from './CatalogListItem.vue'
+import draggable from 'vuedraggable'
 
 export default {
   components: {
-    CatalogListItem
+    CatalogListItem,
+    draggable,
   },
   props: {
     element: {
@@ -166,10 +170,14 @@ export default {
       this.timestamp
       return this.element.querySelector('DataSourceName') ? this.element.querySelector('DataSourceName').innerHTML : ''
     },
-    catalogs() {
-      this.timestamp
-      return this.element.querySelectorAll('Catalogs > Catalog')
-    }
+    catalogs: {
+      get() {
+        this.timestamp
+        return Array.from(this.element.querySelectorAll('Catalogs > Catalog'))
+      },
+      set() {
+      }
+    },
     // iconName() {
     //   this.timestamp
     //   if (this.element.tagName === 'Cube') {
@@ -179,6 +187,19 @@ export default {
     // },
   },
   methods: {
+    dragEnd({ oldIndex, newIndex }) {
+      const items = Array.from(this.element.querySelectorAll('Catalogs > Catalog'))
+
+      items[oldIndex].parentNode.removeChild(items[oldIndex]);
+      if (oldIndex > newIndex) {
+        items[newIndex].insertAdjacentElement('beforeBegin', items[oldIndex])
+      } else {
+        items[newIndex].insertAdjacentElement('afterEnd', items[oldIndex])
+      }
+
+      this.$emit('updateModel');
+      this.$emit('openItem',  { element: null, key: null })
+    },
     addNewItem() {
       const newEl = document.createElementNS(null, "Catalog");
       const catalogArray = this.element.querySelector('Catalogs');

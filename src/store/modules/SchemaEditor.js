@@ -128,10 +128,10 @@ const actions = {
     const currentModelId = modelHistory[modelHistory.length - 1] ? modelHistory[modelHistory.length - 1].id : -1;
     commit('setSchemaHistoryCursor', { position: currentModelId + 1 })
     
-
+    
     const serializer = new XMLSerializer
     const xmlDocState = serializer.serializeToString(state.xmlDoc)
-
+    
     modelHistory.push({
       id: currentModelId + 1,
       timestamp,
@@ -139,7 +139,7 @@ const actions = {
       action,
       xPath
     })
-
+    
     commit('setTimestamp', { timestamp })
   },
   setLastSavedSchema({ commit }, { serializedSchema }) {

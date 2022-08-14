@@ -86,8 +86,8 @@ export default {
       updateTimestamp: Date.now(),
       openedItem: null,
       openedItemKey: null,
-      serverUrl: '../xmla',
-      // serverUrl: 'https://ssemenkoff.dev/emondrian/xmla',
+      // serverUrl: '../xmla',
+      serverUrl: 'https://ssemenkoff.dev/emondrian/xmla',
     };
   },
   async mounted() {
@@ -137,6 +137,8 @@ export default {
         this.$errorModal.open('<b class="text-h6">Could not save DataSource. Configured data is not valid.</b>')
         return;
       }
+
+      console.log(this.xmlDoc)
 
       const serializer = new XMLSerializer
       const database = serializer.serializeToString(this.xmlDoc)
