@@ -138,8 +138,6 @@ export default {
         return;
       }
 
-      console.log(this.xmlDoc)
-
       const serializer = new XMLSerializer
       const database = serializer.serializeToString(this.xmlDoc)
 
