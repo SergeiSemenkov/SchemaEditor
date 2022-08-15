@@ -52,6 +52,7 @@ export default {
     el.style.width = `${cardContent.clientWidth}px`;
     el.style.height = `${cardContent.clientHeight}px`;
     el.style.overflow = `hidden`;
+    cardContent.style.overflow = `hidden`;
 
     this.editor = monaco.editor.create(el, {
       value: this.xmlContent,
