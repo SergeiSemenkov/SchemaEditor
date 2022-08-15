@@ -28,15 +28,8 @@
           </v-btn>
         </v-toolbar>
       </v-card-title>
-      <v-card-text class="pt-5" ref="cardContent">
-        <div>
-          <!-- <v-textarea
-            v-model="xmlContent"
-            ref="textArea"
-          >
-          </v-textarea> -->
-          <div ref="editor"></div>
-        </div>
+      <v-card-text class="pa-0" ref="cardContent">
+        <div ref="editor"></div>
       </v-card-text>
     </v-card>
   </v-dialog>
@@ -58,6 +51,7 @@ export default {
 
     el.style.width = `${cardContent.clientWidth}px`;
     el.style.height = `${cardContent.clientHeight}px`;
+    el.style.overflow = `hidden`;
 
     this.editor = monaco.editor.create(el, {
       value: this.xmlContent,

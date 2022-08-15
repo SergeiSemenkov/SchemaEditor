@@ -86,8 +86,8 @@ export default {
       updateTimestamp: Date.now(),
       openedItem: null,
       openedItemKey: null,
-      // serverUrl: '../xmla',
-      serverUrl: 'https://ssemenkoff.dev/emondrian/xmla',
+      serverUrl: '../xmla',
+      // serverUrl: 'https://ssemenkoff.dev/emondrian/xmla',
     };
   },
   async mounted() {
