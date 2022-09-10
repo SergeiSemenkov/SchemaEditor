@@ -1,10 +1,22 @@
 export function parseXmlModel(model) {
   const jsObjectModel = {}
   const elementsArray = model.querySelectorAll('Model > Element')
-  // const classesArray = model.querySelectorAll('Model > Class')
+  const classesArray = model.querySelectorAll('Model > Class')
 
   elementsArray.forEach(element => {
     const key = element.getAttribute('type')
+    jsObjectModel[key] = {
+      attributes: getAttributesForElement(element),
+      arrays: getArraysForElements(element),
+      objects: getObjectsForElements(element),
+      doc: element.querySelector('Doc')?.innerHTML,
+      hasValue: !!element.querySelector('CData'),
+      abstract: element.getAttribute('abstract') === 'true'
+    }
+  });
+
+  classesArray.forEach(element => {
+    const key = element.getAttribute('class')
     jsObjectModel[key] = {
       attributes: getAttributesForElement(element),
       arrays: getArraysForElements(element),
@@ -24,6 +36,19 @@ export function parseXmlModel(model) {
       jsObjectModel[key].parentClassName = parentClass
     }
 
+    jsObjectModel[key].isInstanceOf = (type) => {
+      if (type === key) {
+        return true
+      }
+      if (jsObjectModel[key].parent) {
+        return jsObjectModel[key].parent.isInstanceOf(type)
+      }
+      return false
+    }
+  })
+
+  classesArray.forEach(element => {
+    const key = element.getAttribute('class')
     jsObjectModel[key].isInstanceOf = (type) => {
       if (type === key) {
         return true
