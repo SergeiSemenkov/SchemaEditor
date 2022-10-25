@@ -9,7 +9,7 @@
       <v-list-item-content>
         <v-list-item-title v-text="name"></v-list-item-title>
       </v-list-item-content>
-        <!-- <v-tooltip bottom>
+        <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
             <v-btn
               icon
@@ -23,7 +23,7 @@
             </v-btn>
           </template>
           <span>Copy</span>
-        </v-tooltip> -->
+        </v-tooltip>
 
         <!-- <v-tooltip bottom>
           <template v-slot:activator="{ on, attrs }">
@@ -102,7 +102,17 @@ export default {
     },
     deleteItem() {
       this.$emit('removeItem', this.element)
-    }
+    },
+    copyItem() {
+      const serializer = new XMLSerializer();
+      const serializedItem = serializer.serializeToString(this.element);
+      const tmpText = document.createElement('textarea')
+      tmpText.value = serializedItem
+      document.querySelector('body').appendChild(tmpText);
+      tmpText.select();
+      document.execCommand('copy');
+      tmpText.parentNode.removeChild(tmpText);
+    },
   }
 }
 </script>

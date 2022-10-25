@@ -3,49 +3,61 @@
     v-model="opened"
     persistent
     fullscreen
+    scrollable
   >
-    <v-card class="d-flex flex-column" style="top: 64px; z-index: 100;">
-      <v-toolbar
-        dark
-        color="primary"
-        class="flex-grow-0 fixed-toolbar"
-      >
-        <v-toolbar-title>XML Editor</v-toolbar-title>
-        <v-spacer></v-spacer>
-        <v-btn
-          class="mr-2"
-          @click="save"
-        >
-          Save
-        </v-btn>
-        <v-btn
-          icon
+    <v-card class="d-flex flex-column" style="z-index: 100;">
+      <v-card-title class="pa-0">
+        <v-toolbar
           dark
-          @click="callCloseAction"
+          color="primary"
         >
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-      </v-toolbar>
-      <v-card-text class="pt-5 flex-grow-1 h-full" ref="cardContent">
-        <v-textarea
-          v-model="xmlContent"
-          ref="textArea"
-        >
-        </v-textarea>
+          <v-toolbar-title>XML Editor</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn
+            class="mr-2"
+            @click="save"
+          >
+            Save
+          </v-btn>
+          <v-btn
+            icon
+            dark
+            @click="callCloseAction"
+          >
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-toolbar>
+      </v-card-title>
+      <v-card-text class="pa-0" ref="cardContent">
+        <div ref="editor"></div>
       </v-card-text>
     </v-card>
   </v-dialog>
 </template>
 
 <script>
+import * as monaco from 'monaco-editor';
+
 export default {
   mounted() {
     const serializer = new XMLSerializer
     const xmlContent = serializer.serializeToString(this.element)
     this.xmlContent = xmlContent
     this.lastSavedElement = xmlContent
-    this.expandTextArea();
     document.querySelector('html').style="overflow: hidden";
+
+    const cardContent = this.$refs.cardContent;
+    const el = this.$refs.editor;
+
+    el.style.width = `${cardContent.clientWidth}px`;
+    el.style.height = `${cardContent.clientHeight}px`;
+    el.style.overflow = `hidden`;
+    cardContent.style.overflow = `hidden`;
+
+    this.editor = monaco.editor.create(el, {
+      value: this.xmlContent,
+      language: 'xml',
+    });
   },
   destroyed() {
     document.querySelector('html').style="";
@@ -67,12 +79,9 @@ export default {
     close() {
       this.opened = false
     },
-    async expandTextArea() {
-      await this.$nextTick();
-      const textArea = this.$refs.textArea.$el.querySelector('textarea');
-      textArea.style.height = textArea.scrollHeight + "px";
-    },
     async save() {
+      this.xmlContent = this.editor.getModel().getValue();
+
       this.lastSavedElement = this.xmlContent
       this.$emit('saveElement', this.xmlContent);
     },
@@ -83,6 +92,8 @@ export default {
       }
     },
     async checkChanges() {
+      this.xmlContent = this.editor.getModel().getValue();
+
       return this.lastSavedElement !== this.xmlContent
         ? this.$confirmationModal.open()
         : { confirmed: true }

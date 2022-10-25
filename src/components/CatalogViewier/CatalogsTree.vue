@@ -8,7 +8,7 @@
         <v-col cols=10 class="capitalize">
           DataSources
         </v-col>
-         <v-col cols=2>
+         <!-- <v-col cols=2>
             <v-tooltip
               bottom
             >
@@ -24,7 +24,7 @@
               </template>
               <span>Add</span>
             </v-tooltip>
-          </v-col>
+          </v-col> -->
       </v-row>
       <v-divider />
       <data-source-tree-item
@@ -64,6 +64,7 @@ export default {
   methods: {
     openItem(payload) {
       this.$emit('openItem', payload)
+      this.updateEditorState(payload.element)
     },
     addNewItem() {
       const newEl = document.createElementNS(null, "DataSource");
@@ -76,6 +77,20 @@ export default {
 
       this.$emit('updateModel');
     },
+    async updateEditorState(currentItem) {
+      if (currentItem !== null) {
+        const listItems = this.$refs.listItems.items.map(i => i.$parent.element)
+        const index = listItems.indexOf(currentItem)
+        await this.$nextTick();
+        this.$refs.listItems.internalLazyValue = index
+
+        const listItemElement = this.$refs.listItems.items[index].$el;
+        listItemElement.scrollIntoView({ block: "center", inline: "nearest", behavior: "smooth" });
+      }
+      else {
+        this.$refs.listItems.internalLazyValue = null
+      }
+    }
   }
 }
 </script>

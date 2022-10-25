@@ -3,6 +3,7 @@ const state = () => ({
   serverUrl: null,
   database: null,
   lastSavedSchema: null,
+  filename: null,
   // Schema state
   timestamp: Date.now(),
   xmlDoc: null,
@@ -39,6 +40,9 @@ const getters = {
       serverUrl: state.serverUrl,
       catalogName: state.database
     }
+  },
+  fileName(state) {
+    return state.filename
   },
   updateTimestamp(state) {
     return state.timestamp
@@ -99,9 +103,11 @@ const actions = {
     commit('setValidationErrors', { errorList });
   },
   setServerUrl({ commit }, { serverUrl }) {
+    commit('setFilename', { fileName: null });
     commit('setServerUrl', { serverUrl });
   },
   setDatabase({ commit }, { databaseName }) {
+    commit('setFilename', { fileName: null });
     commit('setDatabase', { databaseName });
   },
   openEditor({ commit }, { element, attribute }) {
@@ -122,10 +128,10 @@ const actions = {
     const currentModelId = modelHistory[modelHistory.length - 1] ? modelHistory[modelHistory.length - 1].id : -1;
     commit('setSchemaHistoryCursor', { position: currentModelId + 1 })
     
-
+    
     const serializer = new XMLSerializer
     const xmlDocState = serializer.serializeToString(state.xmlDoc)
-
+    
     modelHistory.push({
       id: currentModelId + 1,
       timestamp,
@@ -133,7 +139,7 @@ const actions = {
       action,
       xPath
     })
-
+    
     commit('setTimestamp', { timestamp })
   },
   setLastSavedSchema({ commit }, { serializedSchema }) {
@@ -180,6 +186,12 @@ const actions = {
       serverUrl,
       catalogName
     })
+  },
+  setFilename({ commit }, { fileName }) {
+    commit('setServerUrl', { serverUrl: null });
+    commit('setDatabase', { databaseName: null });
+
+    commit('setFilename', { fileName });
   }
 }
 
@@ -205,6 +217,9 @@ const mutations = {
   },
   setDatabase(state, { databaseName }) {
     state.database = databaseName
+  },
+  setFilename(state, { fileName }) {
+    state.filename = fileName
   },
   setOpenedElement(state, { element, attribute }) {
     state.openedElement = element
