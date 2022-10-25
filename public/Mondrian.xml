@@ -2202,6 +2202,7 @@ Revision is $Id$
         </Object>
         <Array name="schemaGrants" type="SchemaGrant"/>
         <Object name="union" type="Union" required="false" />
+        <Array name="members" type="RoleMember"/>
     </Element>
 
     <Class class="Grant">
@@ -2317,6 +2318,12 @@ Revision is $Id$
         </Attribute>
     </Element>
 
+    <Element type="RoleMember">
+        <Doc>
+            A user name or a member group name.
+        </Doc>
+        <Attribute name="name" required="true"/>
+    </Element>
     <!-- Union ============================================================ -->
     <Element type="Union">
         <Doc>
