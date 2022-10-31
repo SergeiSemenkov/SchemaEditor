@@ -2320,7 +2320,7 @@ Revision is $Id$
 
     <Element type="RoleMember">
         <Doc>
-            User name or member group name. "*" - anyone.
+            User name or member group name.
         </Doc>
         <Attribute name="name" required="true"/>
     </Element>
