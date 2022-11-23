@@ -2242,6 +2242,7 @@ Revision is $Id$
             See <a href="api/mondrian/olap/Role.html#grant(mondrian.olap.Cube, int)">mondrian.olap.Role#grant(mondrian.olap.Cube,int)</a>.
         </Doc>
         <Attribute name="cube" required="true">
+            <Reference xPath="/ancestor::Schema/Cube" attribute="name"></Reference>
             <Doc>The unique name of the cube</Doc>
         </Attribute>
         <Array name="dimensionGrants" type="DimensionGrant"/>
