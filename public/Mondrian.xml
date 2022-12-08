@@ -51,7 +51,7 @@ Revision is $Id$
             </Doc>
         </Attribute>
         <Attribute name="defaultRole" required="false">
-            <Reference xPath="/ancestor::Schema/Role" attribute="name"></Reference>
+            <Reference xPath="/ancestor-or-self::Schema/Role" attribute="name"></Reference>
             <Doc>The name of the default role for connections to this schema</Doc>
         </Attribute>
         <Object name="annotations" type="Annotations" required="false">
