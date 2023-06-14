@@ -1333,6 +1333,7 @@ Revision is $Id$
         <Doc>
             A collection of SQL statements, one per dialect.
         </Doc>
+        <SchemaCaption>alias</SchemaCaption>
         <Attribute name="alias" required="true"/>
         <Array name="selects" type="SQL" min="1"/>
         <Code>

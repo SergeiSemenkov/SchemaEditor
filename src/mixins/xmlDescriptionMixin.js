@@ -17,7 +17,8 @@ export default {
         arrays: [],
         objects: [],
         doc: desc.doc,
-        hasValue: desc.hasValue
+        hasValue: desc.hasValue,
+        schemaCaption: desc.schemaCaption,
       }
 
       mergedDesc.attributes.push(...desc.attributes)

@@ -11,7 +11,8 @@ export function parseXmlModel(model) {
       objects: getObjectsForElements(element),
       doc: element.querySelector('Doc')?.innerHTML,
       hasValue: !!element.querySelector('CData'),
-      abstract: element.getAttribute('abstract') === 'true'
+      abstract: element.getAttribute('abstract') === 'true',
+      schemaCaption: element.querySelector('SchemaCaption')?.innerHTML,
     }
   });
 
@@ -23,7 +24,8 @@ export function parseXmlModel(model) {
       objects: getObjectsForElements(element),
       doc: element.querySelector('Doc')?.innerHTML,
       hasValue: !!element.querySelector('CData'),
-      abstract: element.getAttribute('abstract') === 'true'
+      abstract: element.getAttribute('abstract') === 'true',
+      schemaCaption: element.querySelector('SchemaCaption')?.innerHTML,
     }
   });
 
