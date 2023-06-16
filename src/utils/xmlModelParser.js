@@ -12,7 +12,7 @@ export function parseXmlModel(model) {
       doc: element.querySelector('Doc')?.innerHTML,
       hasValue: !!element.querySelector('CData'),
       abstract: element.getAttribute('abstract') === 'true',
-      schemaCaption: element.querySelector('SchemaCaption')?.innerHTML,
+      schemaCaptionAttribute: element.getAttribute('schemaCaptionAttribute'),
     }
   });
 
@@ -25,7 +25,7 @@ export function parseXmlModel(model) {
       doc: element.querySelector('Doc')?.innerHTML,
       hasValue: !!element.querySelector('CData'),
       abstract: element.getAttribute('abstract') === 'true',
-      schemaCaption: element.querySelector('SchemaCaption')?.innerHTML,
+      schemaCaptionAttribute: element.getAttribute('schemaCaptionAttribute'),
     }
   });
 

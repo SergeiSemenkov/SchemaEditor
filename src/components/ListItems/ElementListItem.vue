@@ -174,7 +174,7 @@ export default {
   computed: {
     name() {
       this.timestamp
-      return this.desc.schemaCaption ? this.element.getAttribute(this.desc.schemaCaption) : this.element.getAttribute('name')
+      return this.desc.schemaCaptionAttribute ? this.element.getAttribute(this.desc.schemaCaptionAttribute) : this.element.getAttribute('name')
     },
     hasArrays() {
       this.timestamp

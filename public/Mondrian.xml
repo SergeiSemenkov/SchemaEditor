@@ -1329,11 +1329,10 @@ Revision is $Id$
         </Code>
     </Element>
 
-    <Element type="View" class="Relation">
+    <Element type="View" class="Relation" schemaCaptionAttribute="alias">
         <Doc>
             A collection of SQL statements, one per dialect.
         </Doc>
-        <SchemaCaption>alias</SchemaCaption>
         <Attribute name="alias" required="true"/>
         <Array name="selects" type="SQL" min="1"/>
         <Code>
