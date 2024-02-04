@@ -9,7 +9,7 @@
   == Copyright (C) 2001-2005 Julian Hyde
   == Copyright (C) 2005-2019 Hitachi Vantara and others
   == Copyright (C) 2019-2021 Topsoft
-  == Copyright (C) 2021-2022 Sergei Semenkov
+  == Copyright (C) 2021-2024 Sergei Semenkov
   == All Rights Reserved.
   ==
   == This file defines an MMM schema for an Olap schema.
@@ -327,6 +327,7 @@ Revision is $Id$
                 Named sets in this cube.
             </Doc>
         </Array>
+        <Array name="actions" type="Action"><Doc></Doc></Array>
         <Code><![CDATA[
             public boolean isEnabled() {
                 return enabled.booleanValue();
@@ -1329,7 +1330,7 @@ Revision is $Id$
         </Code>
     </Element>
 
-    <Element type="View" class="Relation">
+    <Element type="View" class="Relation" schemaCaptionAttribute="alias">
         <Doc>
             A collection of SQL statements, one per dialect.
         </Doc>
