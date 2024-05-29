@@ -1029,6 +1029,12 @@ Revision is $Id$
                 enumerated attributes in a DTD cannot legally contain spaces.)
             </Doc>
         </Attribute>
+        <Attribute name="aggregatorImplementation" required="false">
+            <Doc>
+                Aggregation implementation. There could be different implementaion of an Aggregation function.
+                For example, ClickHouse has implementaions for "distinct-count": uniq, uniqExact, uniqCombined ...
+            </Doc>
+        </Attribute>
         <Attribute name="formatter" required="false">
             <Doc>
                 <p>Name of a formatter class for the appropriate cell being
