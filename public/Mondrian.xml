@@ -1031,7 +1031,7 @@ Revision is $Id$
         </Attribute>
         <Attribute name="aggregatorImplementation" required="false">
             <Doc>
-                Aggregation implementation. There could be different implementaion of an Aggregation function.
+                Aggregation implementation. There could be different implementaions of an Aggregation function.
                 For example, ClickHouse has implementaions for "distinct-count": uniq, uniqExact, uniqCombined ...
             </Doc>
         </Attribute>
