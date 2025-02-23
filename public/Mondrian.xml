@@ -2240,7 +2240,7 @@ Revision is $Id$
         <Array name="cubeGrants" type="CubeGrant"/>
     </Element>
 
-    <Element class="Grant" type="CubeGrant">
+    <Element class="Grant" type="CubeGrant" schemaCaptionAttribute="cube">
         <Doc>
             Grants (or denies) this role access to a cube.
             <code>access</code> may be "all", "custom", or "none".
@@ -2250,14 +2250,14 @@ Revision is $Id$
             See <a href="api/mondrian/olap/Role.html#grant(mondrian.olap.Cube, int)">mondrian.olap.Role#grant(mondrian.olap.Cube,int)</a>.
         </Doc>
         <Attribute name="cube" required="true">
-            <Reference xPath="/ancestor::Schema/Cube" attribute="name"></Reference>
+            <Reference xPath="/ancestor::Schema/Cube | /ancestor::Schema/VirtualCube" attribute="name"></Reference>
             <Doc>The unique name of the cube</Doc>
         </Attribute>
         <Array name="dimensionGrants" type="DimensionGrant"/>
         <Array name="hierarchyGrants" type="HierarchyGrant"/>
     </Element>
 
-    <Element class="Grant" type="DimensionGrant">
+    <Element class="Grant" type="DimensionGrant" schemaCaptionAttribute="dimension">
         <Doc>
             Grants (or denies) this role access to a dimension.
             <code>access</code> may be "all", "custom" or "none".
@@ -2275,7 +2275,7 @@ Revision is $Id$
         </Attribute>
     </Element>
 
-    <Element class="Grant" type="HierarchyGrant">
+    <Element class="Grant" type="HierarchyGrant" schemaCaptionAttribute="hierarchy">
         <Doc>
             Grants (or denies) this role access to a hierarchy.
             <code>access</code> may be "all", "custom" or "none".
@@ -2311,7 +2311,7 @@ Revision is $Id$
         <Array name="memberGrants" type="MemberGrant"/>
     </Element>
 
-    <Element type="MemberGrant">
+    <Element type="MemberGrant" schemaCaptionAttribute="member">
         <Doc>
             Grants (or denies) this role access to a member.
             The children of this member inherit that access.
