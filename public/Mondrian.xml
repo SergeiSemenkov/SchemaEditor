@@ -2629,55 +2629,56 @@ Revision is $Id$
     <!-- DimensionAttribute ============================================== -->
     <Element type="DimensionAttribute" >
         <Doc>
+            Defines an attribute of a dimension, similar to Microsoft Analysis Services Attribute object.
         </Doc>
         <Attribute name="name" type="String" required="true">
-            <Doc></Doc>
+            <Doc>The name of the attribute.</Doc>
         </Attribute>
         <Attribute name="id" type="String">
-            <Doc></Doc>
+            <Doc>The unique identifier for the attribute.</Doc>
         </Attribute>
         <Attribute name="description" type="String">
-            <Doc></Doc>
+            <Doc>Description of the attribute.</Doc>
         </Attribute>
         <Attribute name="usage">
-            <Doc></Doc>
+            <Doc>Specifies the usage type of the attribute (Regular, Key, Parent).</Doc>
             <Value>Regular</Value>
             <Value>Key</Value>
             <Value>Parent</Value>
         </Attribute>
         <Attribute name="estimatedCount" type="Long">
-            <Doc></Doc>
+            <Doc>Estimated number of members for this attribute.</Doc>
         </Attribute>
         <Array name="keyColumns" type="DataItem">
-            <Doc></Doc>
+            <Doc>The columns that define the key for the attribute.</Doc>
         </Array>
         <Object name="nameColumn" type="DataItem">
-            <Doc></Doc>
+            <Doc>The column that provides the name for the attribute members.</Doc>
         </Object>
         <Object name="valueColumn" type="DataItem">
-            <Doc></Doc>
+            <Doc>The column that provides the value for the attribute members.</Doc>
         </Object>
         <Attribute name="orderBy">
-            <Doc></Doc>
+            <Doc>Specifies how members are ordered (Key, Name, AttributeKey, AttributeName).</Doc>
             <Value>Key</Value>
             <Value>Name</Value>
             <Value>AttributeKey</Value>
             <Value>AttributeName</Value>
         </Attribute>
         <Attribute name="defaultMember" type="String">
-            <Doc></Doc>
+            <Doc>The default member for the attribute.</Doc>
         </Attribute>
         <Attribute name="isAggregatable" type="Boolean">
-            <Doc></Doc>
+            <Doc>Indicates if the attribute is aggregatable.</Doc>
         </Attribute>
         <Attribute name="attributeHierarchyEnabled" type="Boolean">
-            <Doc></Doc>
+            <Doc>Indicates if the attribute hierarchy is enabled.</Doc>
         </Attribute>
         <Attribute name="attributeHierarchyVisible" type="Boolean">
-            <Doc></Doc>
+            <Doc>Indicates if the attribute hierarchy is visible.</Doc>
         </Attribute>
         <Attribute name="attributeHierarchyDisplayFolder" type="String">
-            <Doc></Doc>
+            <Doc>The display folder for the attribute hierarchy.</Doc>
         </Attribute>
     </Element>
 
