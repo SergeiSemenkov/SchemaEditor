@@ -646,7 +646,6 @@ Revision is $Id$
 
     <Element type="Level">
         <Attribute name="sourceAttribute" required="false">
-            <Reference xPath="../../../Attributes" attribute="name"></Reference>
             <Doc></Doc>
         </Attribute>
         <Attribute name="approxRowCount" required="false">
