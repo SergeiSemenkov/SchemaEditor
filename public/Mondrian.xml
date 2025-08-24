@@ -2690,21 +2690,13 @@ Revision is $Id$
         </Doc>
         <Attribute name="dataType" required="true">
             <Doc></Doc>
-            <Value>WChar</Value>
+            <Value>String</Value>
+            <Value>Numeric</Value>
             <Value>Integer</Value>
-            <Value>BigInt</Value>
-            <Value>Single</Value>
-            <Value>Double</Value>
+            <Value>Boolean</Value>
             <Value>Date</Value>
-            <Value>Currency</Value>
-            <Value>UnsignedTinyInt</Value>
-            <Value>UnsignedSmallInt</Value>
-            <Value>UnsignedInt</Value>
-            <Value>UnsignedBigInt</Value>
-            <Value>Bool</Value>
-            <Value>Smallint</Value>
-            <Value>Tinyint</Value>
-            <Value>Binary</Value>
+            <Value>Time</Value>
+            <Value>Timestamp</Value>
         </Attribute>
         <Attribute name="dataSize" type="Integer">
             <Doc></Doc>
