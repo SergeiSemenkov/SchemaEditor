@@ -2658,6 +2658,24 @@ Revision is $Id$
         <Attribute name="estimatedCount" type="Long">
             <Doc>Estimated number of members for this attribute.</Doc>
         </Attribute>
+        <Attribute name="levelType" required="false" default="Regular">
+            <Doc>
+                Temporarily, levelType is specified on attribute.
+                Should be specified on hierarchy level, not on Dimension.
+            </Doc>
+            <Value>Regular</Value>
+            <Value>TimeYears</Value>
+            <Value>TimeHalfYears</Value>
+            <Value>TimeHalfYear</Value>
+            <Value>TimeQuarters</Value>
+            <Value>TimeMonths</Value>
+            <Value>TimeWeeks</Value>
+            <Value>TimeDays</Value>
+            <Value>TimeHours</Value>
+            <Value>TimeMinutes</Value>
+            <Value>TimeSeconds</Value>
+            <Value>TimeUndefined</Value>
+        </Attribute>
         <Attribute name="orderBy">
             <Doc>Specifies how members are ordered (Key, Name, AttributeKey, AttributeName).</Doc>
             <Value>Key</Value>
