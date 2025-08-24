@@ -646,7 +646,8 @@ Revision is $Id$
 
     <Element type="Level">
         <Attribute name="sourceAttribute" required="false">
-            <Doc></Doc>
+            <Reference xPath="../../../Attributes/DimensionAttribute" attribute="name"></Reference>
+            <Doc>References a DimensionAttribute defined in the parent dimension's attributes collection.</Doc>
         </Attribute>
         <Attribute name="approxRowCount" required="false">
             <Doc>
