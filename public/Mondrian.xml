@@ -2637,6 +2637,9 @@ Revision is $Id$
         <Attribute name="defaultMember" type="String">
             <Doc>The default member for the attribute.</Doc>
         </Attribute>
+        <Attribute name="primaryKey" type="String">
+            <Doc>Temporary solution. Will be placed to primaryKey of attribute hierarchy.</Doc>
+        </Attribute>
         <Attribute name="name" type="String" required="true">
             <Doc>The name of the attribute.</Doc>
         </Attribute>
