@@ -158,6 +158,11 @@ Revision is $Id$
                 and avoid caching.
             </Doc>
         </Attribute>
+        <Attribute name="table" required="false">NameColumn
+            <Doc>
+                The name of the table that contains this dimension's data.
+            </Doc>
+        </Attribute>
         <Object name="annotations" type="Annotations" required="false">
             <Doc>Contains values of user-defined properties.</Doc>
         </Object>
@@ -2695,9 +2700,9 @@ Revision is $Id$
         <Attribute name="attributeHierarchyDisplayFolder" type="String">
             <Doc>The display folder for the attribute hierarchy.</Doc>
         </Attribute>
-        <Array name="keyColumns" type="DataItem">
-            <Doc>The columns that define the key for the attribute.</Doc>
-        </Array>
+        <Attribute name="keyColumn" type="DataItem">
+            <Doc>The column that defines the key for the attribute.</Doc>
+        </Attribute>
         <Object name="nameColumn" type="DataItem">
             <Doc>The column that provides the name for the attribute members.</Doc>
         </Object>
@@ -2720,6 +2725,9 @@ Revision is $Id$
             <Value>Timestamp</Value>
         </Attribute>
         <Attribute name="dataSize" type="Integer">
+            <Doc></Doc>
+        </Attribute>
+        <Attribute name="columnName" type="String" required="true">
             <Doc></Doc>
         </Attribute>
         <Attribute name="mimeType" type="String">
@@ -2755,20 +2763,6 @@ Revision is $Id$
             <Value>TrimLeft</Value>
             <Value>TrimAll</Value>
             <Value>TrimNone</Value>
-        </Attribute>
-        <Object name="source" type="ColumnBinding">
-            <Doc></Doc>
-        </Object>
-    </Element>
-
-    <Element type="ColumnBinding" >
-        <Doc>
-        </Doc>
-        <Attribute name="tableID" type="String" required="true">
-            <Doc></Doc>
-        </Attribute>
-        <Attribute name="columnID" type="String" required="true">
-            <Doc></Doc>
         </Attribute>
     </Element>
 
