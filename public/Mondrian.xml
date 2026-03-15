@@ -2700,9 +2700,9 @@ Revision is $Id$
         <Attribute name="attributeHierarchyDisplayFolder" type="String">
             <Doc>The display folder for the attribute hierarchy.</Doc>
         </Attribute>
-        <Attribute name="keyColumn" type="DataItem">
+        <Object name="keyColumn" type="DataItem">
             <Doc>The column that defines the key for the attribute.</Doc>
-        </Attribute>
+        </Object>
         <Object name="nameColumn" type="DataItem">
             <Doc>The column that provides the name for the attribute members.</Doc>
         </Object>
