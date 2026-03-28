@@ -2666,24 +2666,6 @@ Revision is $Id$
         <Attribute name="estimatedCount" type="Long">
             <Doc>Estimated number of members for this attribute.</Doc>
         </Attribute>
-        <Attribute name="levelType" required="false" default="Regular">
-            <Doc>
-                Temporarily, levelType is specified on attribute.
-                Should be specified on hierarchy level, not on Dimension.
-            </Doc>
-            <Value>Regular</Value>
-            <Value>TimeYears</Value>
-            <Value>TimeHalfYears</Value>
-            <Value>TimeHalfYear</Value>
-            <Value>TimeQuarters</Value>
-            <Value>TimeMonths</Value>
-            <Value>TimeWeeks</Value>
-            <Value>TimeDays</Value>
-            <Value>TimeHours</Value>
-            <Value>TimeMinutes</Value>
-            <Value>TimeSeconds</Value>
-            <Value>TimeUndefined</Value>
-        </Attribute>
         <Attribute name="orderBy">
             <Doc>Specifies how members are ordered (Key, Name, AttributeKey, AttributeName).</Doc>
             <Value>Key</Value>
@@ -2703,17 +2685,18 @@ Revision is $Id$
         <Attribute name="attributeHierarchyDisplayFolder" type="String">
             <Doc>The display folder for the attribute hierarchy.</Doc>
         </Attribute>
-        <Object name="keyColumn" type="DataItem">
+        <Object name="keyColumn" type="keyColumn">
             <Doc>The column that defines the key for the attribute.</Doc>
         </Object>
-        <Object name="nameColumn" type="DataItem">
+        <Object name="nameColumn" type="nameColumn">
             <Doc>The column that provides the name for the attribute members.</Doc>
         </Object>
-        <Object name="valueColumn" type="DataItem">
+        <Object name="valueColumn" type="valueColumn">
             <Doc>The column that provides the value for the attribute members.</Doc>
         </Object>
     </Element>
 
+    <!-- Define DataItem BEFORE aliases that use class="DataItem" -->
     <Element type="DataItem" >
         <Doc>
         </Doc>
@@ -2768,6 +2751,11 @@ Revision is $Id$
             <Value>TrimNone</Value>
         </Attribute>
     </Element>
+
+    <!-- Aliases so XML uses <keyColumn/>, <nameColumn/>, <valueColumn/> -->
+    <Element type="keyColumn" class="DataItem"/>
+    <Element type="nameColumn" class="DataItem"/>
+    <Element type="valueColumn" class="DataItem"/>
 
 </Model>
 
