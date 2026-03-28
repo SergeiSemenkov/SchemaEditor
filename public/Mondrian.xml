@@ -2685,13 +2685,13 @@ Revision is $Id$
         <Attribute name="attributeHierarchyDisplayFolder" type="String">
             <Doc>The display folder for the attribute hierarchy.</Doc>
         </Attribute>
-        <Object name="keyColumn" type="keyColumn">
+        <Object name="keyColumn" type="KeyColumn">
             <Doc>The column that defines the key for the attribute.</Doc>
         </Object>
-        <Object name="nameColumn" type="nameColumn">
+        <Object name="nameColumn" type="NameColumn">
             <Doc>The column that provides the name for the attribute members.</Doc>
         </Object>
-        <Object name="valueColumn" type="valueColumn">
+        <Object name="valueColumn" type="ValueColumn">
             <Doc>The column that provides the value for the attribute members.</Doc>
         </Object>
     </Element>
@@ -2753,9 +2753,9 @@ Revision is $Id$
     </Element>
 
     <!-- Aliases so XML uses <keyColumn/>, <nameColumn/>, <valueColumn/> -->
-    <Element type="keyColumn" class="DataItem"/>
-    <Element type="nameColumn" class="DataItem"/>
-    <Element type="valueColumn" class="DataItem"/>
+    <Element type="KeyColumn" class="DataItem"/>
+    <Element type="NameColumn" class="DataItem"/>
+    <Element type="ValueColumn" class="DataItem"/>
 
 </Model>
 
