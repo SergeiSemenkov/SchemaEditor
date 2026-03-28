@@ -147,9 +147,9 @@ Revision is $Id$
         <Attribute name="foreignKey">
             <Doc>
                 The name of the column in the fact table which joins
-                to the leaf level of this dimension. Required in a
-                private Dimension or a DimensionUsage, but not in a
-                public Dimension.
+                to the dimension table's primaryKey column.
+                Required in a private Dimension or a DimensionUsage,
+                but not in a public Dimension.
             </Doc>
         </Attribute>
         <Attribute name="highCardinality" type="Boolean" default="false">
@@ -161,6 +161,12 @@ Revision is $Id$
         <Attribute name="table" required="false">NameColumn
             <Doc>
                 The name of the table that contains this dimension's data.
+            </Doc>
+        </Attribute>
+        <Attribute name="primaryKey" required="false">
+            <Doc>
+                Name of the column of the dimension table via which
+                the dimension table is joined to the fact table.
             </Doc>
         </Attribute>
         <Object name="annotations" type="Annotations" required="false">
@@ -2641,9 +2647,6 @@ Revision is $Id$
         </Doc>
         <Attribute name="defaultMember" type="String">
             <Doc>The default member for the attribute.</Doc>
-        </Attribute>
-        <Attribute name="primaryKey" type="String">
-            <Doc>Temporary solution. Will be placed to primaryKey of attribute hierarchy.</Doc>
         </Attribute>
         <Attribute name="name" type="String" required="true">
             <Doc>The name of the attribute.</Doc>
